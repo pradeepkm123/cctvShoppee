@@ -16,7 +16,7 @@ export const UserProvider = ({ children }) => {
         setLoading(false);
         return;
       }
-
+      
       try {
         const response = await axios.get('https://cctvshoppee.onrender.com/api/users/me', {
           headers: {
