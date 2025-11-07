@@ -25,7 +25,7 @@ const Dashboard = () => {
         setLoading(true);
         
         // Fetch orders using public endpoint
-        const ordersResponse = await fetch('http://localhost:5000/api/orders/public');
+        const ordersResponse = await fetch('https://cctvshoppee.onrender.com/api/orders/public');
         if (!ordersResponse.ok) {
           throw new Error(`Orders API error: ${ordersResponse.status}`);
         }
@@ -33,7 +33,7 @@ const Dashboard = () => {
         const orders = ordersData.orders || ordersData || [];
         
         // Fetch products (public endpoint)
-        const productsResponse = await fetch('http://localhost:5000/api/products');
+        const productsResponse = await fetch('https://cctvshoppee.onrender.com/api/products');
         if (!productsResponse.ok) {
           throw new Error(`Products API error: ${productsResponse.status}`);
         }
