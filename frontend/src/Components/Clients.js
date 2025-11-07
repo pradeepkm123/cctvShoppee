@@ -1,88 +1,9 @@
-// import React from 'react';
-// import Slider from 'react-slick';
-// import 'slick-carousel/slick/slick.css';
-// import 'slick-carousel/slick/slick-theme.css';
-
-// function Clients() {
-//   const brandSliderSettings = {
-//     dots: true,
-//     infinite: true,
-//     speed: 500,
-//     slidesToShow: 4,
-//     slidesToScroll: 1,
-//     arrows: true,
-//     responsive: [
-//       {
-//         breakpoint: 1024,
-//         settings: {
-//           slidesToShow: 3,
-//           slidesToScroll: 1,
-//         },
-//       },
-//       {
-//         breakpoint: 600,
-//         settings: {
-//           slidesToShow: 2,
-//           slidesToScroll: 1,
-//         },
-//       },
-//       {
-//         breakpoint: 480,
-//         settings: {
-//           slidesToShow: 1,
-//           slidesToScroll: 1,
-//         },
-//       },
-//     ],
-//   };
-
-//   return (
-//     <div>
-//       <section className="tp-brand-area" style={{marginBottom:'2%'}}>
-//         <div className="container">
-//           <div className="row">
-//             <div className="col-xl-12">
-//               <div className="tp-brand-slider p-relative">
-//                 <Slider {...brandSliderSettings}>
-//                   <div className="tp-brand-item text-center">
-//                     <a href="#">
-//                       <img src="https://html.storebuild.shop/shofy-prv/shofy/assets/img/brand/logo_01.png" alt="Logo 1" />
-//                     </a>
-//                   </div>
-//                   <div className="tp-brand-item text-center">
-//                     <a href="#">
-//                       <img src="https://html.storebuild.shop/shofy-prv/shofy/assets/img/brand/logo_02.png" alt="Logo 2" />
-//                     </a>
-//                   </div>
-//                   <div className="tp-brand-item text-center">
-//                     <a href="#">
-//                       <img src="https://html.storebuild.shop/shofy-prv/shofy/assets/img/brand/logo_03.png" alt="Logo 3" />
-//                     </a>
-//                   </div>
-//                   <div className="tp-brand-item text-center">
-//                     <a href="#">
-//                       <img src="https://html.storebuild.shop/shofy-prv/shofy/assets/img/brand/logo_04.png" alt="Logo 4" />
-//                     </a>
-//                   </div>
-//                 </Slider>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       </section>
-//     </div>
-//   );
-// }
-
-// export default Clients;
-
-
 import React, { useState, useEffect } from 'react';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
-const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
+const API_BASE = process.env.REACT_APP_API_BASE || 'https://cctvshoppee.onrender.com';
 
 function Clients() {
   const [clients, setClients] = useState([]);
