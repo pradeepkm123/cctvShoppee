@@ -10,6 +10,7 @@ import '../Pages/ProductDetails.css';
 
 const API_BASE = 'https://cctvshoppee.onrender.com/api';
 const FILE_HOST = 'https://cctvshoppee.onrender.com';
+const specUrl = 'https://cctvshoppee.onrender.com/api';
 const VISIBLE_THUMBS = 5;
 
 // ---- Helpers ----
