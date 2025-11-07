@@ -10,8 +10,6 @@ import 'swiper/css/scrollbar';
 const API_BASE = 'https://cctvshoppee.onrender.com/api';
 const FILE_HOST = 'https://cctvshoppee.onrender.com';
 // -----------------------------------------------------
-
-/** Normalize upload path to a full URL */
 const getImageUrl = (img) => {
   if (!img) return '/no-image.png';
   const file = String(img)
