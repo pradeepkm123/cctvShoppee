@@ -12,7 +12,7 @@ import {
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://cctvshoppee.onrender.com/api';
 
 const initialState = {
   name: '',
