@@ -313,7 +313,7 @@ function OrderDetails() {
                                     </div>
                                     <div className="col-md-4 text-center">
                                         <img
-                                            src={`http://localhost:5000/uploads/${item.productId?.image || 'no-image.png'}`}
+                                            src={`https://cctvshoppee.onrender.com/uploads/${item.productId?.image || 'no-image.png'}`}
                                             alt={item.productId?.name || 'Product'}
                                             style={{ width: '100px', height: 'auto', objectFit: 'contain' }}
                                         />
