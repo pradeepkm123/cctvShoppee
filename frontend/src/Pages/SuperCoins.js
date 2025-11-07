@@ -13,7 +13,7 @@ function SuperCoins() {
   const [message, setMessage] = useState('');
   const [showSupercoinPopup, setShowSupercoinPopup] = useState(false);
   const [showCoinActivityPopup, setShowCoinActivityPopup] = useState(false);
-
+  
   useEffect(() => {
     const fetchBalance = async () => {
       try {
