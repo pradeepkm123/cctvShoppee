@@ -18,7 +18,7 @@ export const UserProvider = ({ children }) => {
       }
 
       try {
-        const response = await axios.get('http://localhost:5000/api/users/me', {
+        const response = await axios.get('https://cctvshoppee.onrender.com/api/users/me', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
