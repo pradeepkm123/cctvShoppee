@@ -7,8 +7,8 @@ import 'swiper/css';
 import 'swiper/css/scrollbar';
 
 // ---- Adjust if your server hosts files elsewhere ----
-const API_BASE = 'http://localhost:5000/api';
-const FILE_HOST = 'http://localhost:5000';
+const API_BASE = 'https://cctvshoppee.onrender.com/api';
+const FILE_HOST = 'https://cctvshoppee.onrender.com';
 // -----------------------------------------------------
 
 /** Normalize upload path to a full URL */
