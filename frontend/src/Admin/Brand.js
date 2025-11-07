@@ -26,7 +26,7 @@ const BrandManagement = () => {
   // Fetch brands from backend
   const fetchBrands = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/brands');
+      const response = await axios.get('https://cctvshoppee.onrender.com/api/brands');
       setBrands(response.data);
     } catch (error) {
       console.error('Error fetching brands:', error);
