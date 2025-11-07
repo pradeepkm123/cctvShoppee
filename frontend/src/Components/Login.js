@@ -5,7 +5,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // ====== CONFIG ======
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://cctvshoppee.onrender.com/api';
 axios.defaults.baseURL = API_BASE;
 // If your backend uses httpOnly cookies for auth, uncomment next line and enable credentials in server CORS
 // axios.defaults.withCredentials = true;
