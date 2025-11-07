@@ -625,7 +625,7 @@ export default function ProductDetails() {
                               {specUrl ? (
                                 <div className="brochure-embed">
                                   <iframe
-                                    src={`${specUrl}#toolbar=1`}
+                                    src="https://cctvshoppee.onrender.com/uploads/1748678409488.pdf#toolbar=1"
                                     width="100%"
                                     height="100%"
                                     style={{ border: 'none' }}
