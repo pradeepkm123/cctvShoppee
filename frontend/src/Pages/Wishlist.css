@@ -1,0 +1,21 @@
+.tp-cart-list tbody tr:first-child td {
+    padding-top: 30px !important;
+    text-align: center !important;
+    justify-items: center;
+}
+.tp-cart-list .table > :not(caption) > * > * {
+    padding: 20px 0;
+    box-shadow: none;
+    vertical-align: middle;
+    width: 100px;
+}
+table{
+    text-align: center;
+}
+.tp-cart-list .table > :not(caption) > * > * {
+    padding: 20px 0;
+    box-shadow: none;
+    vertical-align: middle;
+    width: 100px;
+    justify-items: center;
+}

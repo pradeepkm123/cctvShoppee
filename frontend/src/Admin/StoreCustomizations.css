@@ -1,0 +1,232 @@
+/* Add your existing CSS here */
+.store-customizations {
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+.header-bar {
+  background: white;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.header-bar h1 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.language-select {
+  padding: 8px 30px 8px 15px;
+  border: 1px solid #d1d1d1;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.tabs {
+  background: white;
+  padding: 15px 30px 0;
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.tab {
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s;
+}
+
+.tab.active {
+  color: #10b981;
+  border-bottom-color: #10b981;
+  font-weight: 500;
+}
+
+.content {
+  padding: 30px;
+  position: relative;
+}
+
+.update-btn {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.update-btn:hover {
+  background: #059669;
+}
+
+.section {
+  background: white;
+  border-radius: 8px;
+  padding: 25px;
+  margin-bottom: 25px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.icon {
+  font-size: 18px;
+  color: #666;
+}
+
+.section-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.input-field {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #d1d1d1;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+  margin-bottom: 15px;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #10b981;
+}
+
+.upload-area {
+  border: 2px dashed #d1d1d1;
+  border-radius: 8px;
+  padding: 50px;
+  text-align: center;
+  background: #fafafa;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-bottom: 15px;
+}
+
+.upload-area:hover {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.upload-icon {
+  font-size: 36px;
+  color: #10b981;
+  margin-bottom: 10px;
+}
+
+.upload-text {
+  font-size: 14px;
+  color: #1a1a1a;
+  margin-bottom: 5px;
+}
+
+.upload-hint {
+  font-size: 12px;
+  color: #999;
+}
+
+.uploaded-image {
+  margin-top: 15px;
+  position: relative;
+  display: inline-block;
+}
+
+.uploaded-image img {
+  width: 100px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e5e5e5;
+}
+
+.remove-btn-small {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.banner-preview {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background: white;
+}
+
+.banner-preview img {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  border-radius: 6px;
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.remove-btn {
+  margin-top: 10px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}

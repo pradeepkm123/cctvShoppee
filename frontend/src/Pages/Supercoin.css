@@ -1,0 +1,223 @@
+.coin-icon {
+            color: #ffc107;
+            font-size: 1.2rem;
+        }
+        
+        .balance-header {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+        
+        .activity-card {
+            background: #e9ecef6b;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .activity-card:hover {
+            background: #dee2e6;
+            transform: translateY(-2px);
+        }
+        
+        .activity-icon {
+            background: #e0ba00;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+        
+        .info-card {
+            border-radius: 20px;
+            padding: 1.5rem;
+            color: white;
+            margin-bottom: 2rem;
+            border: 2px solid #1976d2;
+            transition: all 0.3s ease;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(25, 118, 210, 0.3);
+        }
+        
+        .info-card h5 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #004085; 
+        }
+        
+        .promo-card {
+            border-radius: 16px;
+            padding: 1.5rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .promo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .promo-card-1 {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+        
+        .promo-card-2 {
+            background: linear-gradient(135deg, #a855f7, #9333ea);
+        }
+        
+        .promo-card-3 {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+        }
+        
+        .promo-card h6 {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+        
+        .promo-card h5 {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .promo-card .btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            font-size: 0.85rem;
+            padding: 0.4rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .promo-card .btn:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+            color: white;
+        }
+        
+        .floating-coins {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.6;
+        }
+        
+        .floating-coins i {
+            font-size: 1.2rem;
+            margin-left: 0.3rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .floating-coins i:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+        
+        .floating-coins i:nth-child(3) {
+            animation-delay: 1s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .partner-logos {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        
+        .partner-logo {
+            width: 35px;
+            height: 35px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #333;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .brand-icon {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+        }
+        
+        .flipkart-brand {
+            color: #ff6b35;
+        }
+        
+        .partner-platform-icons {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        
+        .partner-platform-icons .partner-logo {
+            width: 25px;
+            height: 25px;
+            font-size: 0.6rem;
+        }
+        
+        .illustration {
+            position: absolute;
+            right: 1rem;
+            bottom: 1rem;
+            opacity: 0.8;
+        }
+        
+        .illustration i {
+            font-size: 2rem;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        @media (max-width: 768px) {
+            .balance-header {
+                font-size: 1.3rem;
+            }
+            
+            .promo-card {
+                padding: 1.2rem;
+                margin-bottom: 1rem;
+            }
+            
+            .floating-coins {
+                right: 0.5rem;
+            }
+            
+            .floating-coins i {
+                font-size: 1rem;
+            }
+        }
+
+
+
+
+        .ws{
+            color: #003b7a;
+            font-size: 1.7rem;
+        }

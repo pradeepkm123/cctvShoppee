@@ -1,0 +1,23 @@
+const express = require('express');
+const router = express.Router();
+const clientController = require('../controllers/clientController');
+
+// Get all clients for a store
+router.get('/store/:storeId', clientController.getClientsByStore);
+
+// Get client by ID
+router.get('/:id', clientController.getClientById);
+
+// Create new client
+router.post('/', clientController.createClient);
+
+// Update client
+router.put('/:id', clientController.updateClient);
+
+// Delete client
+router.delete('/:id', clientController.deleteClient);
+
+// Reorder clients
+router.put('/reorder/clients', clientController.reorderClients);
+
+module.exports = router;
