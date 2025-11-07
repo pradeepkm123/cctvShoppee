@@ -1,47 +1,3 @@
-// import React from 'react';
-// import '../assets/css/CoinActivityPopup.css';
-// import Supercoin from '../assets/img/super_coin_icon.png';
-
-// function TransactionHistory() {
-//   return (
-//     <div>
-//         <div className="transaction-section">
-//             <h5 className="transaction-header">Transaction History</h5>
-
-//             <div className="transaction-note">
-//               Regular coins issued from Aug 1, 2023 will have 6 months validity from the date of credit. The validity of extra coins may vary from 1 to 6 months depending on the product & seller.
-//             </div>
-
-//             <div className="transaction-item">
-//               <div className="transaction-details">
-//                 <h6>thegameium</h6>
-//                 <small>Credited on 05 Dec 2024 | Valid till 31 Dec 2025</small>
-//               </div>
-//               <div className="transaction-amount positive">+ 249</div>
-//             </div>
-
-//             <div className="transaction-item">
-//               <div className="transaction-details">
-//                 <h6>thegameium</h6>
-//                 <small>Debited on 05 Dec 2024</small>
-//               </div>
-//               <div className="transaction-amount negative">- 249</div>
-//             </div>
-
-//             <div className="transaction-item">
-//               <div className="transaction-details">
-//                 <h6>Redeem for Myntra store OrderId: 12851894...</h6>
-//                 <small>Debited on 04 Dec 2024</small>
-//               </div>
-//               <div className="transaction-amount negative">- 28</div>
-//             </div>
-//           </div>
-//     </div>
-//   )
-// }
-
-// export default TransactionHistory
-
 import React, { useState, useEffect } from 'react';
 import Supercoin from '../assets/img/super_coin_icon.png';
 
@@ -54,7 +10,7 @@ function TransactionHistory() {
     const fetchTransactions = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/supercoins/transactions', {
+        const response = await fetch('https://cctvshoppee.onrender.com/api/supercoins/transactions', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
