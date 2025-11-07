@@ -193,7 +193,7 @@ function Checkout() {
       }
 
       // Step 2: Create Payment Link
-      const paymentRes = await fetch('http://localhost:5000/api/payments/payment-link', {
+      const paymentRes = await fetch('https://cctvshoppee.onrender.com/api/payments/payment-link', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
