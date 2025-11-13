@@ -18,11 +18,9 @@ function Footer() {
                                                     <img src={Logo} alt="logo" width={300} />
                                                 </a>
                                             </div>
-                                            <p class="tp-footer-desc">We are a team of designers and developers that create high quality WordPress</p>
                                             <div class="tp-footer-social">
-                                                <a href="#"><i class="lab la-facebook"></i></a>
-                                                <a href="#"><i class="lab la-twitter"></i></a>
-                                                <a href="#"><i class="lab la-linkedin"></i></a>
+                                                <a href="https://www.facebook.com/CCTVONLINESHOPPE/"><i class="lab la-facebook"></i></a>
+                                                <a href="https://www.instagram.com/cctv_shoppe/"><i class="lab la-instagram"></i></a>
                                                 <a href="#"><i class="lab la-youtube"></i></a>
                                             </div>
                                         </div>
@@ -62,7 +60,7 @@ function Footer() {
                                         <div class="tp-footer-widget-content">
                                             <div class="tp-footer-talk mb-20">
                                                 <span>Got Questions? Call us</span>
-                                                <h4><a href="tel:670-413-90-762">+670 413 90 762</a></h4>
+                                                <h4><a href="tel:670-413-90-762"+91 9994335344</a></h4>
                                             </div>
                                             <div class="tp-footer-contact">
                                                 <div class="tp-footer-contact-item d-flex align-items-start">
@@ -77,7 +75,7 @@ function Footer() {
                                                         </span>
                                                     </div>
                                                     <div class="tp-footer-contact-content">
-                                                        <p><a href="mailto:shofy@support.com">shofy@support.com</a></p>
+                                                        <p><a href="mailto:sales@cctvshoppee.com ">sales@cctvshoppee.com</a></p>
                                                     </div>
                                                 </div>
                                                 <div class="tp-footer-contact-item d-flex align-items-start">
@@ -90,7 +88,7 @@ function Footer() {
                                                         </span>
                                                     </div>
                                                     <div class="tp-footer-contact-content">
-                                                        <p><a href="https://www.google.com/maps/place/Sleepy+Hollow+Rd,+Gouverneur,+NY+13642,+USA/@44.3304966,-75.4552367,17z/data=!3m1!4b1!4m6!3m5!1s0x4cccddac8972c5eb:0x56286024afff537a!8m2!3d44.3304928!4d-75.453048!16s%2Fg%2F1tdsjdj4" target="_blank">79 Sleepy Hollow St. <br /> Jamaica, New York 1432</a></p>
+                                                        <p><a href="https://www.google.com/maps/place/Sleepy+Hollow+Rd,+Gouverneur,+NY+13642,+USA/@44.3304966,-75.4552367,17z/data=!3m1!4b1!4m6!3m5!1s0x4cccddac8972c5eb:0x56286024afff537a!8m2!3d44.3304928!4d-75.453048!16s%2Fg%2F1tdsjdj4" target="_blank">No:6/97 Jaya Nagar,Meera Complex,Mount Poonamallee <br/> High Road,Porur,Chennai - 600116</a></p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -106,7 +104,7 @@ function Footer() {
                                 <div class="row align-items-center">
                                     <div class="col-md-6">
                                         <div class="tp-footer-copyright">
-                                            <p>© 2025 All Rights Reserved  | <a href="index.html">CCTV</a></p>
+                                            <p>© 2025 All Rights Reserved  | <a href="index.html">CCTV SHOPPEE</a></p>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
