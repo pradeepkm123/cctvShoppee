@@ -27,7 +27,7 @@ const StoreCustomizations = () => {
     });
     const [uploadingClient, setUploadingClient] = useState(false);
 
-    const API_BASE = process.env.REACT_APP_API_BASE || 'https://cctvshoppee.onrender.com';
+    const API_BASE = 'https://cctvshoppee.onrender.com';
 
     const tabs = ['Home Page', 'Client'];
 
