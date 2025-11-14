@@ -86,7 +86,7 @@ function About() {
                            <div class="tp-contact-info-item">
                               <div class="tp-contact-info-icon">
                                  <span>
-                                    <img src="../Image/c1.png" alt="" />
+                                    <img src="./Images/c1.png" alt="" />
                                  </span>
                               </div>
                               <div class="tp-contact-info-content">
