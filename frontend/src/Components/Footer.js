@@ -19,9 +19,9 @@ function Footer() {
                                                 </a>
                                             </div>
                                             <div class="tp-footer-social">
-                                                      <a href="https://www.facebook.com/CCTVONLINESHOPPE/"><i class="lab la-facebook"></i></a>
-                                                      <a href="https://www.instagram.com/cctv_shoppe/"><i class="lab la-instagram"></i></a>
-                                                      <a href="#"><i class="lab la-youtube"></i></a>
+                                                      <a href="https://www.facebook.com/CCTVONLINESHOPPE/" target="_blank"><i class="lab la-facebook"></i></a>
+                                                      <a href="https://www.instagram.com/cctv_shoppe/" target="_blank"><i class="lab la-instagram"></i></a>
+                                                      <a href="#" target="_blank"><i class="lab la-youtube"></i></a>
                                             </div>
                                         </div>
                                     </div>
@@ -88,7 +88,7 @@ function Footer() {
                                                         </span>
                                                     </div>
                                                     <div class="tp-footer-contact-content">
-                                                        
+                                                       <p><a href="https://maps.app.goo.gl/kj2Adm3VT56MXodQA" target="_blank">No:6/97 Jaya Nagar,Meera Complex.Mount Poonamallee <br /> High road, Porur Chennai - 600116</a></p> 
                                                     </div>
                                                 </div>
                                             </div>
