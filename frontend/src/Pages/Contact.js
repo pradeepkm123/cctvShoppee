@@ -36,7 +36,7 @@ function About() {
                                  <div class="tp-contact-input-wrapper">
                                     <div class="tp-contact-input-box">
                                        <div class="tp-contact-input">
-                                          <input name="name" id="name" type="text" placeholder="Shahnewaz Sakil" />
+                                          <input name="name" id="name" type="text" />
                                        </div>
                                        <div class="tp-contact-input-title">
                                           <label for="name">Your Name</label>
@@ -44,7 +44,7 @@ function About() {
                                     </div>
                                     <div class="tp-contact-input-box">
                                        <div class="tp-contact-input">
-                                          <input name="email" id="email" type="email" placeholder="shofy@mail.com" />
+                                          <input name="email" id="email" type="email" />
                                        </div>
                                        <div class="tp-contact-input-title">
                                           <label for="email">Your Email</label>
@@ -86,24 +86,24 @@ function About() {
                            <div class="tp-contact-info-item">
                               <div class="tp-contact-info-icon">
                                  <span>
-                                    <img src="./Images/c1.png" alt="" />
+                                    <img src="https://html.storebuild.shop/shofy-prv/shofy/assets/img/contact/contact-icon-1.png" alt="" />
                                  </span>
                               </div>
                               <div class="tp-contact-info-content">
-                                 <p data-info="mail"><a href="mailto:contact@shofy.com">contact@shofy.com</a></p>
-                                 <p data-info="phone"><a href="tel:670-413-90-762">+670 413 90 762</a></p>
+                                 <p data-info="mail"><a href="mailto:sales@cctvshoppee.com">sales@cctvshoppee.com</a></p>
+                                 <p data-info="phone"><a href="tel:+919994335344">+91 9994335344</a></p>
                               </div>
                            </div>
                            <div class="tp-contact-info-item">
                               <div class="tp-contact-info-icon">
                                  <span>
-                                    <img src="../Image/c2.png" alt="" />
+                                  <img src="https://html.storebuild.shop/shofy-prv/shofy/assets/img/contact/contact-icon-2.png" alt="" />
                                  </span>
                               </div>
                               <div class="tp-contact-info-content">
                                  <p>
-                                    <a href="https://www.google.com/maps/place/New+York,+NY,+USA/@40.6976637,-74.1197638,11z/data=!3m1!4b1!4m6!3m5!1s0x89c24fa5d33f083b:0xc80b8f06e177fe62!8m2!3d40.7127753!4d-74.0059728!16zL20vMDJfMjg2" target="_blank">
-                                       84 sleepy hollow st. <br /> jamaica, New York 1432
+                                    <a href="https://maps.app.goo.gl/vtn9GAXn59JxYjfv5" target="_blank">
+                                       No:6/97 Jaya Nagar,Meera Complex.Mount Poonamallee <br /> High road, Porur Chennai - 600116
                                     </a>
                                  </p>
                               </div>
@@ -111,7 +111,7 @@ function About() {
                            <div class="tp-contact-info-item">
                               <div class="tp-contact-info-icon">
                                  <span>
-                                    <img src="../Image/c3.png" alt="" />
+                                    <img src="https://html.storebuild.shop/shofy-prv/shofy/assets/img/contact/contact-icon-3.png" alt="" />
                                  </span>
                               </div>
                               <div class="tp-contact-info-content">
@@ -119,9 +119,9 @@ function About() {
                                     <h4 class="tp-contact-social-title">Find on social media</h4>
 
                                     <div class="tp-contact-social-icon">
-                                       <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-                                       <a href="#"><i class="fa-brands fa-twitter"></i></a>
-                                       <a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
+                                       <a href="https://www.facebook.com/CCTVONLINESHOPPE/" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
+                                       <a href="https://www.instagram.com/cctv_shoppe/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                       <a href="# " target="_blank><i class="fa-brands fa-youtube"></i></a>
                                     </div>
                                  </div>
                               </div>
