@@ -15,7 +15,7 @@ function Footer() {
                                         <div class="tp-footer-widget-content">
                                             <div class="tp-footer-logo">
                                                 <a href="index.html">
-                                                    <img src={Logo} alt="logo" width={300} />
+                                                    <img src={Logo} alt="logo" width={300}  />
                                                 </a>
                                             </div>
                                             <div class="tp-footer-social">
