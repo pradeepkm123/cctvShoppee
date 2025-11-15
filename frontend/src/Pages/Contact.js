@@ -122,7 +122,7 @@ function About() {
                                     <div class="tp-contact-social-icon">
                                        <a href="https://www.facebook.com/CCTVONLINESHOPPE/" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
                                        <a href="https://www.instagram.com/cctv_shoppe/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-                                       <a href="# " target="_blank><i class="fa-brands fa-youtube"></i></a>
+                                       <a href="# " target="_blank"><i class="fa-brands fa-youtube"></i></a>
                                     </div>
                                  </div>
                               </div>
