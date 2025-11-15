@@ -94,37 +94,7 @@ function FilterProduct() {
                     </Link>
                   </div>
                 </div>
-                <div className="tp-product-gadget-banner">
-                  <Slider {...gadgetBannerSliderSettings}>
-                    <div className="tp-product-gadget-banner-item include-bg" id="one">
-                      <Link to="/product">
-                      <div className="tp-product-gadget-banner-content">
-                        <span className="tp-product-gadget-banner-price"></span>
-                        <h3 className="tp-product-gadget-banner-title">
-                        </h3>
-                      </div>
-                      </Link>
-                    </div>
-                    <div className="tp-product-gadget-banner-item include-bg" id="two">
-                      <Link to="/product">
-                      <div className="tp-product-gadget-banner-content">
-                        <span className="tp-product-gadget-banner-price"></span>
-                        <h3 className="tp-product-gadget-banner-title">
-                        </h3>
-                      </div>
-                      </Link>
-                    </div>
-                    <div className="tp-product-gadget-banner-item include-bg" id="three">
-                      <Link to="/product">
-                      <div className="tp-product-gadget-banner-content">
-                        <span className="tp-product-gadget-banner-price"></span>
-                        <h3 className="tp-product-gadget-banner-title">
-                        </h3>
-                      </div>
-                      </Link>
-                    </div>
-                  </Slider>
-                </div>
+               
               </div>
             </div>
             <div className="col-xl-8 col-lg-7">
