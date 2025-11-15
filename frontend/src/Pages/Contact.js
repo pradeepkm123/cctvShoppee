@@ -147,7 +147,7 @@ function About() {
                            </span>
                         </div>
                         <div class="tp-map-iframe">
-                                   <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d6604.864239347136!2d80.1490307!3d13.0356358!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a52615d5e910e59%3A0x9ea7a355f133ac04!2sCCTV%20SHOPPEE%20-%20PORUR!5e1!3m2!1sen!2sin!4v1763104372029!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                          <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d6604.864239347136!2d80.1490307!3d13.0356358!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a52615d5e910e59%3A0x9ea7a355f133ac04!2sCCTV%20SHOPPEE%20-%20PORUR!5e1!3m2!1sen!2sin!4v1763104372029!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                         </div>
                      </div>
                   </div>
