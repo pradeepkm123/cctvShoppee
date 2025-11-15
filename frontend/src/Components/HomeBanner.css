@@ -165,3 +165,13 @@
     );
   }
 }
+
+
+.tp-product-tab .nav-tabs .nav-item .nav-link.active .tp-product-tab-line {
+    opacity: 1;
+    visibility: hidden;
+}
+.tp-section-title svg{
+  visibility: hidden;
+}
+
