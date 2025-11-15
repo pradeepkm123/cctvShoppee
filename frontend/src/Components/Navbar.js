@@ -409,61 +409,6 @@ function Navbar() {
     <div>
       <header>
         <div className="tp-header-area p-relative z-index-11">
-          {/* Header top section - remains same */}
-          <div className="tp-header-top black-bg p-relative z-index-1 d-none d-md-block">
-            <div className="container-fluid">
-              <div className="row align-items-center">
-                <div className="col-md-6">
-                  <div className="tp-header-welcome d-flex align-items-center">
-                    <span>
-                      <i className="las la-shipping-fast"></i>
-                    </span>
-                    <p>FREE Express Shipping On Orders ₹ 3000</p>
-                  </div>
-                </div>
-                <div className="col-md-6">
-                  <div className="tp-header-top-right d-flex align-items-center justify-content-end">
-                    <div className="tp-header-top-menu d-flex align-items-center justify-content-end">
-                      <div className="tp-header-top-menu-item tp-header-lang">
-                        <span className="tp-header-lang-toggle" id="tp-header-lang-toggle">English</span>
-                        <ul>
-                          <li><a href="#">Spanish</a></li>
-                          <li><a href="#">Russian</a></li>
-                          <li><a href="#">Portuguese</a></li>
-                        </ul>
-                      </div>
-                      <div className="tp-header-top-menu-item tp-header-currency">
-                        <span className="tp-header-currency-toggle" id="tp-header-currency-toggle">USD</span>
-                        <ul>
-                          <li><a href="#">EUR</a></li>
-                          <li><a href="#">CHF</a></li>
-                          <li><a href="#">GBP</a></li>
-                          <li><a href="#">KWD</a></li>
-                        </ul>
-                      </div>
-                      <div className="tp-header-top-menu-item tp-header-setting">
-                        <span className="tp-header-setting-toggle" id="tp-header-setting-toggle">Setting</span>
-                        <ul>
-                          {isLoggedIn() ? (
-                            <>
-                              <li><Link to="/profile">My Profile</Link></li>
-                              <li><Link to="/wishlist">Wishlist</Link></li>
-                              <li><Link to="/cart">Cart</Link></li>
-                              <li><button onClick={handleLogout}>Logout</button></li>
-                            </>
-                          ) : (
-                            <li><Link to="/login">Login</Link></li>
-                          )}
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Header main section - remains same */}
           <div className="tp-header-main tp-header-sticky">
             <div className="container-fluid">
               <div className="row align-items-center">
