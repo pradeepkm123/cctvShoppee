@@ -54,21 +54,21 @@ const createStockInward = async (req, res) => {
 const getStockInwards = async (req, res) => {
   try {
     const { startDate, endDate, supplier, location } = req.query;
-    
+
     let filter = {};
-    
+
     // Date filter
     if (startDate || endDate) {
       filter.date = {};
       if (startDate) filter.date.$gte = new Date(startDate);
       if (endDate) filter.date.$lte = new Date(endDate);
     }
-    
+
     // Supplier filter
     if (supplier) {
       filter.supplier = supplier;
     }
-    
+
     // Location filter
     if (location) {
       filter.location = location;

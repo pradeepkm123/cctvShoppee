@@ -142,6 +142,16 @@ function Product() {
     return matchesSearch && matchesCategory && matchesPrice;
   });
 
+  const toAbsUrl = (u) => {
+    if (!u) return '';
+    let s = String(u).trim().replace(/\\/g, '/');
+    if (/^https?:\/\//i.test(s)) return s;
+    if (!s.startsWith('uploads/')) {
+      s = 'uploads/' + s.replace(/^\/+/, '');
+    }
+    return `${API_BASE.replace(/\/api$/, '')}/${s}`;
+  };
+
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -295,8 +305,16 @@ function Product() {
                       />
                     </td>
                     <td className="product-info">
-                      <div className="product-name">{product.name}</div>
-                      <div className="product-description">{product.description}</div>
+                      <img
+                        src={toAbsUrl(product.image) || 'https://via.placeholder.com/50'}
+                        alt={product.name}
+                        className="product-thumbnail"
+                        onError={(e) => { e.target.src = 'https://via.placeholder.com/50'; }}
+                      />
+                      <div className="product-main-info">
+                        <div className="product-name">{product.name}</div>
+                        <div className="product-description">{product.description}</div>
+                      </div>
                     </td>
                     <td className="category-cell">
                       <span className="category-tag">{product.category?.name || product.category}</span>
@@ -313,9 +331,13 @@ function Product() {
                       <div className="stock-badge">{product.stock}</div>
                     </td>
                     <td className="status-cell">
-                      <div className={`status-badge ${product.stock > 0 ? 'in-stock' : 'out-of-stock'}`}>
-                        {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                      </div>
+                      {product.stock <= 0 ? (
+                        <div className="status-badge out-of-stock">Out of Stock</div>
+                      ) : product.stock <= 5 ? (
+                        <div className="status-badge low-stock">Only {product.stock} left</div>
+                      ) : (
+                        <div className="status-badge in-stock">In Stock</div>
+                      )}
                     </td>
                     <td className="actions-cell">
                       <div className="action-buttons">

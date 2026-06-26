@@ -492,8 +492,10 @@ exports.updateProduct = async (req, res) => {
 
     // Helper: sanitize primitive values (remove "", "null", "undefined")
     const clean = (v) => {
-      if (v === '' || v === undefined || v === null) return undefined;
-      if (typeof v === 'string' && (v.toLowerCase() === 'null' || v.toLowerCase() === 'undefined')) return undefined;
+      if (v === undefined) return undefined;
+      if (v === '' || v === null || (typeof v === 'string' && (v.toLowerCase() === 'null' || v.toLowerCase() === 'undefined'))) {
+        return null;
+      }
       return v;
     };
 
@@ -512,11 +514,11 @@ exports.updateProduct = async (req, res) => {
 
     // START – build "updates" from body (only defined & changed)
     const fields = [
-      'name','description','sku','brand','status','model','productTag','productType',
-      'nightVision','audioChannel','battery','type','irRange','poePorts','ethernetPorts','offers',
-      'megaPixel','biometricType','videoChannel','cameraType','accessControl','channel','lens',
-      'communications','bodyType','upLinkPorts','sfpPorts','builtInPower','sataPorts','sdCard',
-      'productBadge','productTab'
+      'name', 'description', 'sku', 'brand', 'status', 'model', 'productTag', 'productType',
+      'nightVision', 'audioChannel', 'battery', 'type', 'irRange', 'poePorts', 'ethernetPorts', 'offers',
+      'megaPixel', 'biometricType', 'videoChannel', 'cameraType', 'accessControl', 'channel', 'lens',
+      'communications', 'bodyType', 'upLinkPorts', 'sfpPorts', 'builtInPower', 'sataPorts', 'sdCard',
+      'productBadge', 'productTab'
     ];
 
     const updates = {};
@@ -562,9 +564,9 @@ exports.updateProduct = async (req, res) => {
     // ---- FILES ----
     // PDFs & banners (replace if provided)
     const brochureFile = req.files?.brochure?.[0]?.filename || null;
-    const specFile     = req.files?.specification?.[0]?.filename || null;
-    const banner1File  = req.files?.banner1?.[0]?.filename || null;
-    const banner2File  = req.files?.banner2?.[0]?.filename || null;
+    const specFile = req.files?.specification?.[0]?.filename || null;
+    const banner1File = req.files?.banner1?.[0]?.filename || null;
+    const banner2File = req.files?.banner2?.[0]?.filename || null;
 
     const baseUploads = path.join(__dirname, '../uploads');
 
@@ -589,24 +591,41 @@ exports.updateProduct = async (req, res) => {
       updates.banner2 = banner2File;
     }
 
-    // New media (append; don’t wipe)
-    const imageFiles = (req.files?.images || []).map(f => f.filename);
-    const videoFiles = (req.files?.videos || []).map(f => f.filename);
+    // Media (Images & Videos) Reconciliation
+    // The client should send existingImages/existingVideos as arrays of filenames (not URLs)
+    let existingImages = req.body.existingImages;
+    let existingVideos = req.body.existingVideos;
 
-    if (imageFiles.length || videoFiles.length) {
+    // Handle case where they arrive as single strings or JSON
+    if (typeof existingImages === 'string') {
+      try { existingImages = JSON.parse(existingImages); } catch { existingImages = [existingImages]; }
+    }
+    if (typeof existingVideos === 'string') {
+      try { existingVideos = JSON.parse(existingVideos); } catch { existingVideos = [existingVideos]; }
+    }
+
+    const newImageFiles = (req.files?.images || []).map(f => f.filename);
+    const newVideoFiles = (req.files?.videos || []).map(f => f.filename);
+
+    // If client sent existing media, we trust it and delete what's missing
+    if (existingImages || existingVideos || newImageFiles.length || newVideoFiles.length) {
+      const imagesToKeep = existingImages || p.images || [];
+      const videosToKeep = existingVideos || p.videos || [];
+
+      // Combine with new uploads
+      const finalImages = [...imagesToKeep, ...newImageFiles];
+      const finalVideos = [...videosToKeep, ...newVideoFiles];
+
+      // Build new media array
       const newMedia = [
-        ...imageFiles.map(f => ({ type: 'image', file: f })),
-        ...videoFiles.map(f => ({ type: 'video', file: f })),
+        ...finalImages.map((f, i) => ({ type: 'image', file: f, order: i })),
+        ...finalVideos.map((f, i) => ({ type: 'video', file: f, order: finalImages.length + i })),
       ];
-      // append and re-number order
-      const merged = [...(p.media || []), ...newMedia];
-      merged.forEach((m, i) => (m.order = i));
-      p.media  = merged;
-      p.images = [...(p.images || []), ...imageFiles];
-      p.videos = [...(p.videos || []), ...videoFiles];
 
-      // maintain legacy single image
-      if (!p.image && imageFiles[0]) p.image = imageFiles[0];
+      p.images = finalImages;
+      p.videos = finalVideos;
+      p.media = newMedia;
+      p.image = finalImages[0] || null; // Update main image to first in list
     }
 
     // Apply scalar updates on the doc (not wiping arrays)
@@ -625,7 +644,7 @@ exports.updateProduct = async (req, res) => {
     out.banner2 = mapUrl(out.banner2);
     out.images = (out.images || []).map(mapUrl);
     out.videos = (out.videos || []).map(mapUrl);
-    out.media  = (out.media || []).map(m => ({ ...m, file: mapUrl(m.file) }));
+    out.media = (out.media || []).map(m => ({ ...m, file: mapUrl(m.file) }));
 
     return res.status(200).json({ message: 'Product updated successfully', product: out });
   } catch (err) {

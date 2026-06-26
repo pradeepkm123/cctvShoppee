@@ -6,15 +6,27 @@ import {
   IconButton, Alert, FormHelperText, Tab, Tabs, Accordion,
   AccordionSummary, AccordionDetails, Avatar
 } from '@mui/material';
-import { 
-  Close, CloudUpload, AddPhotoAlternate, 
+import {
+  Close, CloudUpload, AddPhotoAlternate,
   Videocam, Description, Image, ExpandMore,
   Delete, Visibility
 } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
-const API_BASE = 'https://cctvshoppee.onrender.com/api';
+const API_BASE = 'http://localhost:5000/api';
+const FILE_HOST = 'http://localhost:5000';
+
+const toAbsUrl = (u) => {
+  if (!u) return '';
+  let s = String(u).trim().replace(/\\/g, '/');
+  if (/^https?:\/\//i.test(s)) return s;
+  if (!s.toLowerCase().startsWith('uploads/')) {
+    s = 'uploads/' + s.replace(/^\/+/, '');
+  }
+  return `${FILE_HOST}/${s}`;
+};
+
 
 const EMPTY = {
   _id: '',
@@ -209,21 +221,36 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
       const fd = new FormData();
 
       const scalars = [
-        'name','description','sku','brand','category','oldPrice','newPrice','stock','status',
-        'model','productTag','productType','nightVision','audioChannel','battery','type','irRange',
-        'poePorts','ethernetPorts','offers','megaPixel','biometricType','videoChannel','cameraType',
-        'accessControl','channel','lens','communications','bodyType','upLinkPorts','sfpPorts',
-        'builtInPower','sataPorts','sdCard','productBadge','productTab'
+        'name', 'description', 'sku', 'brand', 'category', 'oldPrice', 'newPrice', 'stock', 'status',
+        'model', 'productTag', 'productType', 'nightVision', 'audioChannel', 'battery', 'type', 'irRange',
+        'poePorts', 'ethernetPorts', 'offers', 'megaPixel', 'biometricType', 'videoChannel', 'cameraType',
+        'accessControl', 'channel', 'lens', 'communications', 'bodyType', 'upLinkPorts', 'sfpPorts',
+        'builtInPower', 'sataPorts', 'sdCard', 'productBadge', 'productTab',
+        'brochure', 'specification', 'banner1', 'banner2'
       ];
-      
+
       scalars.forEach(k => {
-        const v = product[k];
-        if (v !== undefined && v !== null && String(v).trim() !== '') {
-          fd.append(k, v);
+        let v = product[k];
+        if (v === undefined) return;
+        if (v === null || (typeof v === 'string' && v.trim() === '')) {
+          v = "null"; // Send special "null" string for explicit deletion in backend
         }
+        fd.append(k, v);
       });
 
       fd.append('isTrending', product.isTrending ? 'true' : 'false');
+
+      // Send existing filenames to keep
+      const extractFilename = (url) => {
+        if (!url || typeof url !== 'string') return url;
+        return url.split('/').pop();
+      };
+
+      const existingImages = (product.images || []).map(extractFilename);
+      const existingVideos = (product.videos || []).map(extractFilename);
+
+      fd.append('existingImages', JSON.stringify(existingImages));
+      fd.append('existingVideos', JSON.stringify(existingVideos));
 
       (product.newImages || []).forEach(f => fd.append('images', f));
       (product.newVideos || []).forEach(f => fd.append('videos', f));
@@ -254,61 +281,61 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
             <Typography variant="h6" gutterBottom color="primary">
               Basic Information
             </Typography>
-            
-            <TextField 
-              label="Product Name *" 
-              name="name" 
-              value={product.name || ''} 
-              onChange={handleChange} 
-              fullWidth 
-              margin="normal" 
+
+            <TextField
+              label="Product Name *"
+              name="name"
+              value={product.name || ''}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
               error={!!errors.name}
               helperText={errors.name}
             />
-            
-            <TextField 
-              label="Product Description" 
-              name="description" 
-              value={product.description || ''} 
-              onChange={handleChange} 
-              fullWidth 
-              margin="normal" 
-              multiline 
+
+            <TextField
+              label="Product Description"
+              name="description"
+              value={product.description || ''}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              multiline
               rows={3}
             />
-            
+
             <Grid container spacing={2}>
               <Grid item xs={6}>
-                <TextField 
-                  label="SKU *" 
-                  name="sku" 
-                  value={product.sku || ''} 
-                  onChange={handleChange} 
-                  fullWidth 
-                  margin="normal" 
+                <TextField
+                  label="SKU *"
+                  name="sku"
+                  value={product.sku || ''}
+                  onChange={handleChange}
+                  fullWidth
+                  margin="normal"
                   error={!!errors.sku}
                   helperText={errors.sku}
                 />
               </Grid>
               <Grid item xs={6}>
-                <TextField 
-                  label="Brand" 
-                  name="brand" 
-                  value={product.brand || ''} 
-                  onChange={handleChange} 
-                  fullWidth 
-                  margin="normal" 
+                <TextField
+                  label="Brand"
+                  name="brand"
+                  value={product.brand || ''}
+                  onChange={handleChange}
+                  fullWidth
+                  margin="normal"
                 />
               </Grid>
             </Grid>
 
-            <TextField 
-              label="Category" 
-              name="category" 
-              value={product.category?.name || product.category || ''} 
-              onChange={handleChange} 
-              fullWidth 
-              margin="normal" 
+            <TextField
+              label="Category"
+              name="category"
+              value={product.category?.name || product.category || ''}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
             />
 
             <TextField label="Model" name="model" value={product.model || ''} onChange={handleChange} fullWidth margin="normal" />
@@ -323,53 +350,53 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
             <Typography variant="h6" gutterBottom color="primary">
               Pricing & Inventory
             </Typography>
-            
+
             <Grid container spacing={2}>
               <Grid item xs={6}>
-                <TextField 
-                  label="Old Price" 
-                  name="oldPrice" 
-                  value={product.oldPrice || ''} 
-                  onChange={handleChange} 
-                  fullWidth 
-                  margin="normal" 
+                <TextField
+                  label="Old Price"
+                  name="oldPrice"
+                  value={product.oldPrice || ''}
+                  onChange={handleChange}
+                  fullWidth
+                  margin="normal"
                   type="number"
                 />
               </Grid>
               <Grid item xs={6}>
-                <TextField 
-                  label="New Price *" 
-                  name="newPrice" 
-                  value={product.newPrice || ''} 
-                  onChange={handleChange} 
-                  fullWidth 
-                  margin="normal" 
+                <TextField
+                  label="New Price *"
+                  name="newPrice"
+                  value={product.newPrice || ''}
+                  onChange={handleChange}
+                  fullWidth
+                  margin="normal"
                   type="number"
                   error={!!errors.newPrice}
                   helperText={errors.newPrice}
                 />
               </Grid>
               <Grid item xs={6}>
-                <TextField 
-                  label="Stock *" 
-                  name="stock" 
-                  value={product.stock || ''} 
-                  onChange={handleChange} 
-                  fullWidth 
-                  margin="normal" 
+                <TextField
+                  label="Stock *"
+                  name="stock"
+                  value={product.stock || ''}
+                  onChange={handleChange}
+                  fullWidth
+                  margin="normal"
                   type="number"
                   error={!!errors.stock}
                   helperText={errors.stock}
                 />
               </Grid>
               <Grid item xs={6}>
-                <TextField 
-                  label="Status" 
-                  name="status" 
-                  value={product.status || ''} 
-                  onChange={handleChange} 
-                  fullWidth 
-                  margin="normal" 
+                <TextField
+                  label="Status"
+                  name="status"
+                  value={product.status || ''}
+                  onChange={handleChange}
+                  fullWidth
+                  margin="normal"
                 />
               </Grid>
             </Grid>
@@ -378,7 +405,7 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
               <Typography variant="h6" gutterBottom color="primary">
                 Product Features
               </Typography>
-              
+
               <Grid container spacing={2}>
                 <Grid item xs={6}>
                   <FormControl fullWidth margin="normal">
@@ -410,11 +437,11 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
                     Feature this product in trending section
                   </Typography>
                 </Box>
-                <Switch 
-                  name="isTrending" 
-                  checked={!!product.isTrending} 
-                  onChange={handleSwitchChange} 
-                  color="primary" 
+                <Switch
+                  name="isTrending"
+                  checked={!!product.isTrending}
+                  onChange={handleSwitchChange}
+                  color="primary"
                 />
               </Box>
             </Box>
@@ -447,12 +474,12 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
                     { label: 'Lens', name: 'lens' },
                   ].map((field) => (
                     <Grid item xs={6} key={field.name}>
-                      <TextField 
-                        label={field.label} 
-                        name={field.name} 
-                        value={product[field.name] || ''} 
-                        onChange={handleChange} 
-                        fullWidth 
+                      <TextField
+                        label={field.label}
+                        name={field.name}
+                        value={product[field.name] || ''}
+                        onChange={handleChange}
+                        fullWidth
                         size="small"
                       />
                     </Grid>
@@ -476,12 +503,12 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
                     { label: 'Communications', name: 'communications' },
                   ].map((field) => (
                     <Grid item xs={6} key={field.name}>
-                      <TextField 
-                        label={field.label} 
-                        name={field.name} 
-                        value={product[field.name] || ''} 
-                        onChange={handleChange} 
-                        fullWidth 
+                      <TextField
+                        label={field.label}
+                        name={field.name}
+                        value={product[field.name] || ''}
+                        onChange={handleChange}
+                        fullWidth
                         size="small"
                       />
                     </Grid>
@@ -508,12 +535,12 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
                     { label: 'Offers', name: 'offers' },
                   ].map((field) => (
                     <Grid item xs={6} key={field.name}>
-                      <TextField 
-                        label={field.label} 
-                        name={field.name} 
-                        value={product[field.name] || ''} 
-                        onChange={handleChange} 
-                        fullWidth 
+                      <TextField
+                        label={field.label}
+                        name={field.name}
+                        value={product[field.name] || ''}
+                        onChange={handleChange}
+                        fullWidth
                         size="small"
                       />
                     </Grid>
@@ -552,7 +579,7 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
                           <Grid item xs={4} key={`existing-img-${index}`}>
                             <Box sx={{ position: 'relative' }}>
                               <img
-                                src={url}
+                                src={toAbsUrl(url)}
                                 alt={`existing-${index}`}
                                 style={{
                                   width: '100%',
@@ -591,7 +618,7 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
                       <AddPhotoAlternate color="primary" />
                       <Typography variant="h6">Add New Images</Typography>
                     </Box>
-                    
+
                     <Button
                       component="label"
                       variant="outlined"
@@ -609,41 +636,41 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
                       />
                     </Button>
 
-                {product.newImages.length > 0 && (
-                  <Grid container spacing={1} sx={{ mt: 2 }}>
-                    {product.newImages.map((file, index) => (
-                      <Grid item xs={4} key={`new-img-${index}`}>
-                        <Box sx={{ position: 'relative' }}>
-                          <img
-                            src={URL.createObjectURL(file)}
-                            alt={`new-${index}`}
-                            style={{
-                              width: '100%',
-                              height: 80,
-                              objectFit: 'cover',
-                              borderRadius: 1,
-                              border: '1px solid #e0e0e0'
-                            }}
-                          />
-                          <IconButton
-                            size="small"
-                            sx={{
-                              position: 'absolute',
-                              top: 4,
-                              right: 4,
-                              backgroundColor: 'rgba(0,0,0,0.5)',
-                              color: 'white',
-                              '&:hover': { backgroundColor: 'rgba(0,0,0,0.7)' }
-                            }}
-                            onClick={() => removeNewImage(index)}
-                          >
-                            <Delete fontSize="small" />
-                          </IconButton>
-                        </Box>
+                    {product.newImages.length > 0 && (
+                      <Grid container spacing={1} sx={{ mt: 2 }}>
+                        {product.newImages.map((file, index) => (
+                          <Grid item xs={4} key={`new-img-${index}`}>
+                            <Box sx={{ position: 'relative' }}>
+                              <img
+                                src={URL.createObjectURL(file)}
+                                alt={`new-${index}`}
+                                style={{
+                                  width: '100%',
+                                  height: 80,
+                                  objectFit: 'cover',
+                                  borderRadius: 1,
+                                  border: '1px solid #e0e0e0'
+                                }}
+                              />
+                              <IconButton
+                                size="small"
+                                sx={{
+                                  position: 'absolute',
+                                  top: 4,
+                                  right: 4,
+                                  backgroundColor: 'rgba(0,0,0,0.5)',
+                                  color: 'white',
+                                  '&:hover': { backgroundColor: 'rgba(0,0,0,0.7)' }
+                                }}
+                                onClick={() => removeNewImage(index)}
+                              >
+                                <Delete fontSize="small" />
+                              </IconButton>
+                            </Box>
+                          </Grid>
+                        ))}
                       </Grid>
-                    ))}
-                  </Grid>
-                )}
+                    )}
                   </CardContent>
                 </Card>
               </Box>
@@ -663,7 +690,7 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
                           <Grid item xs={6} key={`existing-vid-${index}`}>
                             <Box sx={{ position: 'relative' }}>
                               <video
-                                src={url}
+                                src={toAbsUrl(url)}
                                 style={{
                                   width: '100%',
                                   height: 100,
@@ -702,7 +729,7 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
                       <Videocam color="primary" />
                       <Typography variant="h6">Add New Videos</Typography>
                     </Box>
-                    
+
                     <Button
                       component="label"
                       variant="outlined"
@@ -769,7 +796,7 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
                         <Description color="primary" />
                         <Typography variant="h6">Brochure</Typography>
                       </Box>
-                      
+
                       {product.brochure && (
                         <Box display="flex" alignItems="center" gap={1} mb={2} p={1} sx={{ backgroundColor: '#f5f5f5', borderRadius: 1 }}>
                           <Description />
@@ -781,7 +808,7 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
                           </IconButton>
                         </Box>
                       )}
-                      
+
                       <Button
                         component="label"
                         variant="outlined"
@@ -797,10 +824,10 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
                           hidden
                         />
                       </Button>
-                      
+
                       {product.newBrochure && (
-                        <Chip 
-                          label={product.newBrochure.name} 
+                        <Chip
+                          label={product.newBrochure.name}
                           onDelete={() => setProduct(p => ({ ...p, newBrochure: null }))}
                           sx={{ mt: 1 }}
                         />
@@ -816,7 +843,7 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
                         <Description color="primary" />
                         <Typography variant="h6">Specification</Typography>
                       </Box>
-                      
+
                       {product.specification && (
                         <Box display="flex" alignItems="center" gap={1} mb={2} p={1} sx={{ backgroundColor: '#f5f5f5', borderRadius: 1 }}>
                           <Description />
@@ -828,7 +855,7 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
                           </IconButton>
                         </Box>
                       )}
-                      
+
                       <Button
                         component="label"
                         variant="outlined"
@@ -844,10 +871,10 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
                           hidden
                         />
                       </Button>
-                      
+
                       {product.newSpecification && (
-                        <Chip 
-                          label={product.newSpecification.name} 
+                        <Chip
+                          label={product.newSpecification.name}
                           onDelete={() => setProduct(p => ({ ...p, newSpecification: null }))}
                           sx={{ mt: 1 }}
                         />
@@ -867,17 +894,17 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
                         <Image color="primary" />
                         <Typography variant="h6">Banner 1</Typography>
                       </Box>
-                      
+
                       {product.banner1 && (
                         <Box sx={{ mb: 2 }}>
                           <img
-                            src={product.banner1}
+                            src={toAbsUrl(product.banner1)}
                             alt="Current Banner 1"
                             style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 1 }}
                           />
                         </Box>
                       )}
-                      
+
                       <Button
                         component="label"
                         variant="outlined"
@@ -893,7 +920,7 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
                           hidden
                         />
                       </Button>
-                      
+
                       {product.newBanner1 && (
                         <Box sx={{ mt: 1 }}>
                           <img
@@ -914,17 +941,17 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
                         <Image color="primary" />
                         <Typography variant="h6">Banner 2</Typography>
                       </Box>
-                      
+
                       {product.banner2 && (
                         <Box sx={{ mb: 2 }}>
                           <img
-                            src={product.banner2}
+                            src={toAbsUrl(product.banner2)}
                             alt="Current Banner 2"
                             style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 1 }}
                           />
                         </Box>
                       )}
-                      
+
                       <Button
                         component="label"
                         variant="outlined"
@@ -940,7 +967,7 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
                           hidden
                         />
                       </Button>
-                      
+
                       {product.newBanner2 && (
                         <Box sx={{ mt: 1 }}>
                           <img
@@ -964,13 +991,13 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
   };
 
   return (
-    <Drawer 
-      anchor="right" 
-      open={open} 
+    <Drawer
+      anchor="right"
+      open={open}
       onClose={resetAndClose}
       PaperProps={{ sx: { width: { xs: '100%', sm: 700 } } }}
     >
-      <Box sx={{ p: 3, height: '100vh', overflow: 'auto',marginTop:'10%' }}>
+      <Box sx={{ p: 3, height: '100vh', overflow: 'auto', marginTop: '10%' }}>
         {/* Header */}
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
           <Box>
@@ -1009,7 +1036,7 @@ const EditProductDrawer = ({ open, onClose, productToEdit }) => {
           >
             Back
           </Button>
-          
+
           {activeStep === steps.length - 1 ? (
             <Button
               onClick={handleSubmit}

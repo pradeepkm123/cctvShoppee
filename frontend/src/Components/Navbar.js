@@ -18,6 +18,10 @@ function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const navigate = useNavigate();
   const { wishlistCount } = useContext(WishlistContext) || {};
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notificationRef = useRef(null);
 
   // --- Search states ---
   const [searchTerm, setSearchTerm] = useState('');
@@ -70,13 +74,33 @@ function Navbar() {
     }
   };
 
+  const fetchNotifications = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token || token === 'undefined') return;
+
+      const response = await axios.get(`${API_BASE}/notifications`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = Array.isArray(response.data) ? response.data : [];
+      setNotifications(data);
+      setUnreadCount(data.filter(n => !n.isRead).length);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
+
   useEffect(() => {
     if (isLoggedIn()) {
       fetchCartData();
       fetchWishlistData();
+      fetchNotifications();
     } else {
       setCart([]);
       setWishlist([]);
+      setNotifications([]);
+      setUnreadCount(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -273,6 +297,12 @@ function Navbar() {
     }
   };
 
+  const closeNotificationIfClickedOutside = (e) => {
+    if (notificationRef.current && !notificationRef.current.contains(e.target)) {
+      setShowNotifications(false);
+    }
+  };
+
   const closeMobileMenuIfClickedOutside = (e) => {
     if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target) && isMenuOpen) {
       closeMobileMenu();
@@ -282,13 +312,41 @@ function Navbar() {
   useEffect(() => {
     document.addEventListener('mousedown', closeSearchIfClickedOutside);
     document.addEventListener('mousedown', closeMobileMenuIfClickedOutside);
+    document.addEventListener('mousedown', closeNotificationIfClickedOutside);
 
     return () => {
       document.removeEventListener('mousedown', closeSearchIfClickedOutside);
       document.removeEventListener('mousedown', closeMobileMenuIfClickedOutside);
+      document.removeEventListener('mousedown', closeNotificationIfClickedOutside);
       document.body.style.overflow = 'auto';
     };
   }, [isMenuOpen]);
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`${API_BASE}/notifications/read-all`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    } catch (error) {
+      console.error('Error marking all as read:', error);
+    }
+  };
+
+  const handleMarkAsRead = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`${API_BASE}/notifications/${id}/read`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNotifications(prev => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (error) {
+      console.error('Error marking as read:', error);
+    }
+  };
 
   const goToProduct = (id) => {
     setSearchOpen(false);
@@ -330,72 +388,35 @@ function Navbar() {
       type: "link"
     },
     {
-      label: "Cables",
-      type: "dropdown",
-      items: [
-        { label: "3+1 Cables", path: "/product?category=3+1 Cables" },
-        { label: "Co-Axial Cables", path: "/product?category=Co-Axial Cables" },
-        { label: "OFC", path: "/product?category=OFC" },
-        { label: "CAT - 6", path: "/product?category=CAT - 6" },
-        { label: "Telephone Cable", path: "/product?category=Telephone Cable" },
-        { label: "For Fire Alarm", path: "/product?category=For Fire Alarm" },
-      ]
-    },
-    {
       label: "Accessories",
       type: "dropdown",
       items: [
-        { label: "SMPS & Adaptors", path: "/product?category=SMPS & Adaptors" },
-        { label: "SMPS", path: "/product?category=SMPS" },
-        { label: "Adapter", path: "/product?category=Adapter" },
-        { label: "HDMI & VGA", path: "/product?category=HDMI & VGA" },
-        { label: "Extender / Splitter / Converter", path: "/product?category=Extender / Splitter / Converter" },
-        { label: "Hard Disk", path: "/product?category=Hard Disk" },
-        { label: "Rack", path: "/product?category=Rack" },
-        { label: "Connectors", path: "/product?category=Connectors" },
-        { label: "Nail Clip / Tape / Junction Box", path: "/product?category=Nail Clip / Tape /Junction Box" },
-        { label: "Other Accessories", path: "/product?category=Other Accessories" },
-      ]
-    },
-    {
-      label: "Networking",
-      type: "dropdown",
-      items: [
-        { label: "POE Switch", path: "/product?category=POE Switch" },
-        { label: "Networking Switch", path: "/product?category=Networking Switch" },
-        { label: "Access Point", path: "/product?category=Access Point" },
-        { label: "Router", path: "/product?category=Router" },
-        { label: "Media Converter", path: "/product?category=Media Converter" },
+        { label: "Cables", path: "/product?category=Cables" },
+        { label: "Networking", path: "/product?category=Networking" },
       ]
     },
     {
       label: "Access Control",
       type: "dropdown",
       items: [
-        { label: "Digital PBX", path: "/product?category=Digital PBX" },
-        { label: "Telephone", path: "/product?category=Telephone" },
-        { label: "PBX License", path: "/product?category=PBX License" },
-        { label: "IP PBX", path: "/product?category=IP PBX" },
-        { label: "PBX Accessories", path: "/product?category=PBX Accessories" },
+        { label: "Biometric", path: "/product?category=Biometric" },
+        { label: "Video DOP", path: "/product?category=Video DOP" },
       ]
     },
     {
       label: "Security Products",
       type: "dropdown",
       items: [
+        { label: "Boom Barrier", path: "/product?category=Boom Barrier" },
         { label: "Fire Alarm System", path: "/product?category=Fire Alarm System" },
-        { label: "Intrusion System", path: "/product?category=Intrusion System" },
       ]
     },
     {
-      label: "Shop by Brand",
+      label: "Shop by Brands",
       type: "dropdown",
       items: [
-        { label: "Blog Standard", path: "/product?category=Blog Standard" },
-        { label: "Blog Grid", path: "/product?category=Blog Grid" },
-        { label: "Blog List", path: "/product?category=Blog List" },
-        { label: "Blog Details Full Width", path: "/product?category=Blog Details Full Width" },
-        { label: "Blog Details", path: "/product?category=Blog Details" },
+        { label: "Secura", path: "/product?brand=Secura" },
+        { label: "CP Plus", path: "/product?brand=CP Plus" },
       ]
     },
     {
@@ -564,7 +585,7 @@ function Navbar() {
                 <div className="col-xl-2 col-lg-3 col-md-8 col-6">
                   <div className="tp-header-main-right d-flex align-items-center justify-content-center">
                     <div className="tp-header-action d-flex align-items-center">
-                       <div className="tp-header-action-item">
+                      <div className="tp-header-action-item">
                         <Link to={isLoggedIn() ? "/account" : "/login"} className="d-flex align-items-center">
                           <div className="tp-header-login-icon">
                             <i className="las la-user-circle"></i>
@@ -577,6 +598,83 @@ function Navbar() {
                           <span className="tp-header-action-badge">{wishlistCountToShow}</span>
                         </Link>
                       </div>
+                      <div className="tp-header-action-item" style={{ position: 'relative' }} ref={notificationRef}>
+                        <button
+                          type="button"
+                          className="tp-header-action-btn"
+                          onClick={() => setShowNotifications(!showNotifications)}
+                        >
+                          <i className="las la-bell"></i>
+                          {unreadCount > 0 && <span className="tp-header-action-badge" style={{ backgroundColor: '#EF4444' }}>{unreadCount}</span>}
+                        </button>
+
+                        {showNotifications && (
+                          <div
+                            className="notification-dropdown"
+                            style={{
+                              position: 'absolute',
+                              top: '120%',
+                              right: 0,
+                              width: '320px',
+                              background: '#fff',
+                              boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                              borderRadius: '8px',
+                              zIndex: 1001,
+                              overflow: 'hidden'
+                            }}
+                          >
+                            <div style={{ padding: '15px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <h6 style={{ margin: 0, fontWeight: 700 }}>Notifications</h6>
+                              {unreadCount > 0 && (
+                                <button
+                                  onClick={handleMarkAllAsRead}
+                                  style={{ background: 'none', border: 'none', color: '#2563EB', fontSize: '12px', cursor: 'pointer', padding: 0 }}
+                                >
+                                  Mark all as read
+                                </button>
+                              )}
+                            </div>
+                            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                              {notifications.length === 0 ? (
+                                <div style={{ padding: '30px 15px', textAlign: 'center', color: '#6B7280' }}>
+                                  <i className="las la-bell-slash" style={{ fontSize: '32px', marginBottom: '10px', display: 'block' }}></i>
+                                  No notifications yet
+                                </div>
+                              ) : (
+                                notifications.map((n) => (
+                                  <div
+                                    key={n._id}
+                                    onClick={() => {
+                                      if (!n.isRead) handleMarkAsRead(n._id);
+                                      if (n.link) navigate(n.link);
+                                      setShowNotifications(false);
+                                    }}
+                                    style={{
+                                      padding: '12px 15px',
+                                      borderBottom: '1px solid #f3f4f6',
+                                      backgroundColor: n.isRead ? 'transparent' : '#F3F4F6',
+                                      cursor: 'pointer',
+                                      transition: 'background-color 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = n.isRead ? '#f9fafb' : '#e5e7eb'}
+                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = n.isRead ? 'transparent' : '#F3F4F6'}
+                                  >
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                      <span style={{ fontWeight: 600, fontSize: '14px', color: '#111827' }}>{n.title}</span>
+                                      <span style={{ fontSize: '11px', color: '#9CA3AF' }}>{new Date(n.createdAt).toLocaleDateString()}</span>
+                                    </div>
+                                    <p style={{ margin: 0, fontSize: '13px', color: '#4B5563', lineHeight: '1.4' }}>{n.message}</p>
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                            <div style={{ padding: '10px', textAlign: 'center', borderTop: '1px solid #eee' }}>
+                              <Link to="/notifications" onClick={() => setShowNotifications(false)} style={{ fontSize: '13px', color: '#2563EB', textDecoration: 'none' }}>View all notifications</Link>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
                       <div className="tp-header-action-item">
                         <button
                           type="button"
@@ -644,66 +742,31 @@ function Navbar() {
                           <li className="has-dropdown has-mega-menu"><Link to="/shop">New Products</Link></li>
                           <li><Link to="/coupon">LED</Link></li>
                           <li className="has-dropdown">
-                            <Link to="/blog">Cables <i className="las la-angle-down"></i></Link>
+                            <Link to="/product?category=Accessories">Accessories <i className="las la-angle-down"></i></Link>
                             <ul className="tp-submenu">
-                              <li><Link to="/product?category=3+1 Cables">3+1 Cables</Link></li>
-                              <li><Link to="/product?category=Co-Axial Cables">Co-Axial Cables</Link></li>
-                              <li><Link to="/product?category=OFC">OFC</Link></li>
-                              <li><Link to="/product?category=CAT - 6">CAT - 6</Link></li>
-                              <li><Link to="/product?category=Telephone Cable">Telephone Cable</Link></li>
-                              <li><Link to="/product?category=For Fire Alarm">For Fire Alarm</Link></li>
+                              <li><Link to="/product?category=Cables">Cables</Link></li>
+                              <li><Link to="/product?category=Networking">Networking</Link></li>
                             </ul>
                           </li>
                           <li className="has-dropdown">
-                            <Link to="/blog">Accessories <i className="las la-angle-down"></i></Link>
+                            <Link to="/product?category=Access Control">Access Control <i className="las la-angle-down"></i></Link>
                             <ul className="tp-submenu">
-                              <li><Link to="/product?category=SMPS & Adaptors">SMPS & Adaptors</Link></li>
-                              <li><Link to="/product?category=SMPS">SMPS</Link></li>
-                              <li><Link to="/product?category=Adapter">Adapter</Link></li>
-                              <li><Link to="/product?category=HDMI & VGA">HDMI & VGA</Link></li>
-                              <li><Link to="/product?category=Extender / Splitter / Converter">Extender / Splitter / Converter</Link></li>
-                              <li><Link to="/product?category=Hard Disk">Hard Disk</Link></li>
-                              <li><Link to="/product?category=Rack">Rack</Link></li>
-                              <li><Link to="/product?category=Connectors">Connectors</Link></li>
-                              <li><Link to="/product?category=Nail Clip / Tape /Junction Box">Nail Clip / Tape / Junction Box</Link></li>
-                              <li><Link to="/product?category=Other Accessories">Other Accessories</Link></li>
-                            </ul>
-                          </li>
-                          <li className="has-dropdown">
-                            <Link to="/blog">Networking <i className="las la-angle-down"></i></Link>
-                            <ul className="tp-submenu">
-                              <li><Link to="/product?category=POE Switch">POE Switch</Link></li>
-                              <li><Link to="/product?category=Networking Switch">Networking Switch</Link></li>
-                              <li><Link to="/product?category=Access Point">Access Point</Link></li>
-                              <li><Link to="/product?category=Router">Router</Link></li>
-                              <li><Link to="/product?category=Media Converter">Media Converter</Link></li>
-                            </ul>
-                          </li>
-                          <li className="has-dropdown">
-                            <Link to="/blog">Access Control <i className="las la-angle-down"></i></Link>
-                            <ul className="tp-submenu">
-                              <li><Link to="/product?category=Digital PBX">Digital PBX</Link></li>
-                              <li><Link to="/product?category=Telephone">Telephone</Link></li>
-                              <li><Link to="/product?category=PBX License">PBX License</Link></li>
-                              <li><Link to="/product?category=IP PBX">IP PBX</Link></li>
-                              <li><Link to="/product?category=PBX Accessories">PBX Accessories</Link></li>
+                              <li><Link to="/product?category=Biometric">Biometric</Link></li>
+                              <li><Link to="/product?category=Video DOP">Video DOP</Link></li>
                             </ul>
                           </li>
                           <li className="has-dropdown">
                             <Link to="/product?category=Security products">Security Products <i className="las la-angle-down"></i></Link>
                             <ul className="tp-submenu">
+                              <li><Link to="/product?category=Boom Barrier">Boom Barrier</Link></li>
                               <li><Link to="/product?category=Fire Alarm System">Fire Alarm System</Link></li>
-                              <li><Link to="/product?category=Intrusion System">Intrusion System</Link></li>
                             </ul>
                           </li>
                           <li className="has-dropdown">
-                            <Link to="/product?category=Brand">Shop by Brand <i className="las la-angle-down"></i></Link>
+                            <Link to="/product?category=Brand">Shop by Brands <i className="las la-angle-down"></i></Link>
                             <ul className="tp-submenu">
-                              <li><Link to="/product?category=Blog Standard">Blog Standard</Link></li>
-                              <li><Link to="/product?category=Blog Grid">Blog Grid</Link></li>
-                              <li><Link to="/product?category=Blog List">Blog List</Link></li>
-                              <li><Link to="/product?category=Blog Details Full Width">Blog Details Full Width</Link></li>
-                              <li><Link to="/product?category=Blog Details">Blog Details</Link></li>
+                              <li><Link to="/product?brand=Secura">Secura</Link></li>
+                              <li><Link to="/product?brand=CP Plus">CP Plus</Link></li>
                             </ul>
                           </li>
                           <li><Link to="/contact">Contact</Link></li>

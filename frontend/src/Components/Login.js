@@ -110,7 +110,7 @@ function Login() {
     }
     try {
       await axios.post('/auth/forgot-password', { email: formData.email });
-      toast.success('OTP sent to your email!');
+      toast.success('OTP sent! Please check your email for your CCTV SHOPPEE verification code.');
       setShowOTP(true);
       setOtpTimer(120);
       setIsOtpValid(true);
@@ -151,7 +151,7 @@ function Login() {
   const handleResendOTP = async () => {
     try {
       await axios.post('/auth/forgot-password', { email: formData.email });
-      toast.success('New OTP sent to your email!');
+      toast.success('New OTP sent! Please check your email from CCTV SHOPPEE.');
       setOtpTimer(120);
       setIsOtpValid(true);
     } catch (error) {

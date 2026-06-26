@@ -57,6 +57,36 @@
     margin-bottom: 32px;
 }
 
+.filter-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 20px;
+}
+
+.filter-header-row span {
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    color: #212529;
+}
+
+.filter-header-row .btn-link {
+    font-size: 12px;
+    text-decoration: none;
+    color: #007bff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.filter-header-row .btn-link:hover {
+    text-decoration: underline;
+    color: #0056b3;
+}
+
 .filter-sections:last-child {
     margin-bottom: 0;
 }
@@ -82,35 +112,59 @@
 }
 
 .filter-checkboxs {
-    width: 16px;
-    height: 16px;
-    border: 2px solid #dee2e6;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid #ced4da;
     border-radius: 3px;
+    background-color: #fff;
+    cursor: pointer;
+    display: inline-grid;
+    place-content: center;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     margin-right: 12px;
-    position: relative;
     flex-shrink: 0;
+    position: relative;
+    top: 1px;
 }
 
 .filter-checkboxs:checked {
-    background-color: #007bff;
-    border-color: #007bff;
+    background-color: #2874f0;
+    border-color: #2874f0;
 }
 
-.filter-checkboxs:checked::after {
-    content: '✓';
-    position: absolute;
-    top: -2px;
-    left: 2px;
-    color: white;
-    font-size: 10px;
-    font-weight: bold;
+.filter-checkboxs::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+    transform: scale(0);
+    transform-origin: center;
+    transition: 120ms transform cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background-color: #fff;
+}
+
+.filter-checkboxs:checked::before {
+    transform: scale(1);
+}
+
+.filter-checkboxs:hover {
+    border-color: #2874f0;
+    box-shadow: 0 0 0 4px rgba(40, 116, 240, 0.1);
 }
 
 .filter-labels {
     font-size: 14px;
-    color: #495057;
+    color: #212529;
     cursor: pointer;
     user-select: none;
+    font-weight: 400;
+    transition: color 0.2s ease;
+}
+
+.filter-options:hover .filter-labels {
+    color: #2874f0;
 }
 
 /* Content Area */
@@ -275,6 +329,14 @@
 }
 
 .status-arriving .status-dot {
+    background-color: #28a745;
+}
+
+.status-completed {
+    color: #28a745;
+}
+
+.status-completed .status-dot {
     background-color: #28a745;
 }
 
@@ -1291,5 +1353,66 @@
 
     50% {
         opacity: 0.7;
+    }
+}
+
+/* ───────────────────────────────────────────────
+   Order Timeline – Flipkart-style dotted lines
+─────────────────────────────────────────────── */
+
+/* Completed segment: animated marching-ants green dots */
+.timeline-line-done {
+    background: repeating-linear-gradient(to bottom,
+            #26a541 0px,
+            #26a541 6px,
+            transparent 6px,
+            transparent 12px);
+    background-size: 3px 12px;
+    animation: marchingAnts 0.6s linear infinite;
+}
+
+/* Upcoming segment: static dashed gray dots */
+.timeline-line-pending {
+    background: repeating-linear-gradient(to bottom,
+            #d0d0d0 0px,
+            #d0d0d0 5px,
+            transparent 5px,
+            transparent 11px);
+    background-size: 3px 11px;
+}
+
+/* Marching ants: dots scroll upward on completed lines */
+@keyframes marchingAnts {
+    0% {
+        background-position: 0 0;
+    }
+
+    100% {
+        background-position: 0 -12px;
+    }
+}
+
+/* Current active step circle – pulsing green ring */
+.timeline-circle-active {
+    animation: pulseRing 1.4s ease-out infinite;
+}
+
+@keyframes pulseRing {
+    0% {
+        box-shadow: 0 0 0 0 rgba(38, 165, 65, 0.55);
+    }
+
+    60% {
+        box-shadow: 0 0 0 10px rgba(38, 165, 65, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(38, 165, 65, 0);
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
     }
 }

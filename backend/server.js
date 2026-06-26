@@ -27,6 +27,7 @@ const locationRoutes = require('./routes/locationRoutes');
 const brandRoutes = require('./routes/brandRoutes');
 const stockInwardRoutes = require('./routes/stockInwardRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 
 const app = express();
@@ -52,6 +53,7 @@ connectDB();
 app.use('/uploads/banners', express.static(path.join(__dirname, 'uploads', 'banners')));
 // Serve static uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads/popups', express.static(path.join(__dirname, 'uploads', 'popups')));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -74,8 +76,9 @@ app.use('/api/brands', brandRoutes);
 app.use('/api/stock-inward', stockInwardRoutes)
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/slides', require('./routes/slideRoutes'));
-app.use('/api/clients', require('./routes/clientRoutes')); 
-
+app.use('/api/clients', require('./routes/clientRoutes'));
+app.use('/api/popups', require('./routes/popupRoutes'));
+app.use('/api/notifications', notificationRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {
@@ -113,4 +116,3 @@ server.listen(PORT, () => {
 });
 
 module.exports = app;
-  

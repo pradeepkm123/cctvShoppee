@@ -16,10 +16,12 @@ const VISIBLE_THUMBS = 5;
 // ---- Helpers ----
 const toAbsUrl = (u) => {
   if (!u) return '';
-  const s = String(u).trim();
+  let s = String(u).trim().replace(/\\/g, '/');
   if (/^https?:\/\//i.test(s)) return s;
-  const clean = s.replace(/\\/g, '/').replace(/^\/?uploads\/?/i, 'uploads/');
-  return `${FILE_HOST}/${clean.replace(/^\/+/, '')}`;
+  if (!s.toLowerCase().startsWith('uploads/')) {
+    s = 'uploads/' + s.replace(/^\/+/, '');
+  }
+  return `${FILE_HOST}/${s}`;
 };
 
 // ---- Custom Hooks ----
@@ -326,7 +328,7 @@ export default function ProductDetails() {
     if (activeMedia?.type === 'video' && mainVideoRef.current) {
       const timer = setTimeout(() => {
         try {
-          mainVideoRef.current.play().catch(() => {});
+          mainVideoRef.current.play().catch(() => { });
         } catch (e) {
           console.error('Error playing video:', e);
         }
@@ -493,9 +495,19 @@ export default function ProductDetails() {
                     <h3 className="tp-product-details-title">{product.name}</h3>
                     <div className="tp-product-details-inventory d-flex align-items-center mb-10">
                       <div className="tp-product-details-stock mb-10">
-                        <span className={`inline-flex px-2 text-xs font-medium leading-5 rounded-full ${product.stock > 0 ? 'text-emerald-600 bg-emerald-100' : 'text-red-600 bg-red-100'}`}>
-                          {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                        </span>
+                        {product.stock <= 0 ? (
+                          <span className="inline-flex px-2 text-xs font-medium leading-5 rounded-full text-red-600 bg-red-100">
+                            Out of Stock
+                          </span>
+                        ) : product.stock <= 5 ? (
+                          <span className="inline-flex px-2 text-xs font-medium leading-5 rounded-full text-orange-600 bg-orange-100">
+                            Hurry, Only {product.stock} left!
+                          </span>
+                        ) : (
+                          <span className="inline-flex px-2 text-xs font-medium leading-5 rounded-full text-emerald-600 bg-emerald-100">
+                            In Stock
+                          </span>
+                        )}
                       </div>
                       <div className="tp-product-details-rating-wrapper d-flex align-items-center mb-10" style={{ gap: 10, marginLeft: 12 }}>
                         <div className="tp-product-details-rating" title={`Most common rating: ${ratingStats.highestStar}★`}>
@@ -708,6 +720,38 @@ export default function ProductDetails() {
             </div>
           </div>
         </section>
+
+        {/* Banners Section */}
+        {(product.banner1 || product.banner2) && (
+          <section className="tp-product-banner-area pb-50">
+            <div className="container">
+              <div className="row">
+                {product.banner1 && (
+                  <div className={product.banner2 ? "col-xl-6 col-lg-6 mb-30" : "col-xl-12 mb-30"}>
+                    <div className="tp-product-banner-item">
+                      <img
+                        src={toAbsUrl(product.banner1)}
+                        alt="Product Banner 1"
+                        style={{ width: '100%', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
+                      />
+                    </div>
+                  </div>
+                )}
+                {product.banner2 && (
+                  <div className={product.banner1 ? "col-xl-6 col-lg-6 mb-30" : "col-xl-12 mb-30"}>
+                    <div className="tp-product-banner-item">
+                      <img
+                        src={toAbsUrl(product.banner2)}
+                        alt="Product Banner 2"
+                        style={{ width: '100%', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Related products */}
         <RelatedProduct productId={id} />

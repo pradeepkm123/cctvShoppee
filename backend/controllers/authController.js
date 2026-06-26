@@ -72,13 +72,12 @@ exports.forgotPassword = async (req, res) => {
     if (!user) return res.status(404).send('User not found');
 
     const otp = generateOTP();
-    user.otp = otp;
-    user.otpExpires = new Date(Date.now() + 3600000); // 1 hour from now
-    await user.save();
+    // sendOTP now handles saving the OTP to the database
+    await sendOTP(email, otp);
 
-    sendOTP(email, otp);
     res.status(200).send('OTP sent to your email');
   } catch (error) {
+    console.error('Forgot password error:', error);
     res.status(500).send('Error sending OTP');
   }
 };

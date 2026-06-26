@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 // Ensure upload directory exists
-const uploadDir = 'uploads/clients';
+const uploadDir = path.join(__dirname, '..', 'uploads', 'clients');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -42,12 +42,12 @@ const upload = multer({
 exports.getClientsByStore = async (req, res) => {
   try {
     const { storeId } = req.params;
-    
+
     console.log('Fetching clients for store:', storeId);
-    
-    const clients = await Client.find({ 
-      storeId, 
-      isActive: true 
+
+    const clients = await Client.find({
+      storeId,
+      isActive: true
     }).sort({ order: 1 });
 
     console.log(`Found ${clients.length} clients for store ${storeId}`);
@@ -71,9 +71,9 @@ exports.getClientsByStore = async (req, res) => {
 exports.getClientById = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const client = await Client.findById(id);
-    
+
     if (!client) {
       return res.status(404).json({
         success: false,
@@ -188,10 +188,12 @@ exports.updateClient = async (req, res) => {
 
       if (req.file) {
         // Delete old image file
-        const oldImagePath = existingClient.image.replace('uploads/clients/', '');
-        const fullOldPath = path.join(uploadDir, oldImagePath);
-        if (fs.existsSync(fullOldPath)) {
-          fs.unlinkSync(fullOldPath);
+        if (existingClient.image) {
+          const oldFileName = path.basename(existingClient.image);
+          const fullOldPath = path.join(uploadDir, oldFileName);
+          if (fs.existsSync(fullOldPath)) {
+            fs.unlinkSync(fullOldPath);
+          }
         }
         updateData.image = `uploads/clients/${req.file.filename}`;
       }
@@ -227,7 +229,7 @@ exports.deleteClient = async (req, res) => {
     const { id } = req.params;
 
     const client = await Client.findById(id);
-    
+
     if (!client) {
       return res.status(404).json({
         success: false,
@@ -236,10 +238,12 @@ exports.deleteClient = async (req, res) => {
     }
 
     // Delete image file
-    const imagePath = client.image.replace('uploads/clients/', '');
-    const fullPath = path.join(uploadDir, imagePath);
-    if (fs.existsSync(fullPath)) {
-      fs.unlinkSync(fullPath);
+    if (client.image) {
+      const fileName = path.basename(client.image);
+      const fullPath = path.join(uploadDir, fileName);
+      if (fs.existsSync(fullPath)) {
+        fs.unlinkSync(fullPath);
+      }
     }
 
     await Client.findByIdAndDelete(id);
@@ -269,7 +273,7 @@ exports.reorderClients = async (req, res) => {
       });
     }
 
-    const updatePromises = clients.map(client => 
+    const updatePromises = clients.map(client =>
       Client.findByIdAndUpdate(client.id, { order: client.order })
     );
 

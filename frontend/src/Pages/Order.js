@@ -5,6 +5,14 @@ import Footer from '../Components/Footer';
 import OrderFilter from '../Components/OrderFilter';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import {
+  SwipeableList,
+  SwipeableListItem,
+  SwipeAction,
+  TrailingActions,
+} from 'react-swipeable-list';
+import 'react-swipeable-list/dist/styles.css';
+import { toast } from 'react-toastify';
 
 function Order() {
   const [orders, setOrders] = useState([]);
@@ -55,7 +63,16 @@ function Order() {
     onTheWay: ['ontheway', 'onway', 'on_the_way', 'arriving', 'shipped'],
     delivered: ['delivered', 'completed'],
     cancelled: ['cancelled', 'canceled'],
-    returned: ['returned', 'refund', 'refunded'],
+    returnRequested: ['returnrequested', 'return_requested', 'return requested'],
+  };
+
+  // Helper: Get newest timeline description
+  const getStatusDescription = (order) => {
+    if (order.timeline && order.timeline.length > 0) {
+      const last = order.timeline[order.timeline.length - 1];
+      return last.description || last.note || `Order status updated to ${order.status}`;
+    }
+    return 'Your order has been placed.';
   };
 
   // Helper: Check if order is within last 30 days
@@ -128,6 +145,28 @@ function Order() {
   // Toggle filters
   const toggleFilters = () => setShowFilters((s) => !s);
 
+  // Reset all filters
+  const resetAllFilters = () => {
+    setFilters({
+      status: {
+        onTheWay: false,
+        delivered: false,
+        cancelled: false,
+        returnRequested: false,
+      },
+      time: {
+        last30days: false,
+        year2024: false,
+        year2023: false,
+        year2022: false,
+        year2021: false,
+        older: false,
+      },
+    });
+    setSearch('');
+    setDebouncedSearch('');
+  };
+
   // Handle filter changes
   const handleFilterChange = (e) => {
     const { id, checked } = e.target;
@@ -182,23 +221,36 @@ function Order() {
     if (debouncedSearch) {
       result = result
         .map((order) => {
+          const orderIdStr = (order._id || '').toString().toLowerCase();
           const statusStr = (order.status || '').toString().toLowerCase();
-          const statusMatches = statusStr.includes(debouncedSearch);
+          const descriptionStr = getStatusDescription(order).toLowerCase();
+
+          // Match at the order level (ID, Status, Description)
+          const orderLevelMatch =
+            orderIdStr.includes(debouncedSearch) ||
+            statusStr.includes(debouncedSearch) ||
+            descriptionStr.includes(debouncedSearch);
+
+          // Match at the item level (Name, Brand, Category, Price)
           const matchedItems = (order.items || []).filter((it) => {
             const p = it.productId || {};
             const name = (p.name || '').toString().toLowerCase();
             const brand = (p.brand?.name || p.brand || '').toString().toLowerCase();
             const categoryName = resolveCategoryName(p).toLowerCase();
+
             return (
               name.includes(debouncedSearch) ||
               brand.includes(debouncedSearch) ||
               categoryName.includes(debouncedSearch)
             );
           });
-          if (statusMatches || matchedItems.length > 0) {
+
+          // If anything matches, show the whole order if it's an order-level match,
+          // otherwise show only the items that matched.
+          if (orderLevelMatch || matchedItems.length > 0) {
             return {
               ...order,
-              items: statusMatches && matchedItems.length === 0 ? order.items : matchedItems,
+              items: orderLevelMatch ? order.items : matchedItems,
             };
           }
           return null;
@@ -232,6 +284,24 @@ function Order() {
     return safe.startsWith('http') ? safe : `https://cctvshoppee.onrender.com/uploads/${safe.split('/').pop()}`;
   };
 
+  // Handle Swipe Delete
+  const handleDeleteOrder = async (orderId) => {
+    try {
+      if (!window.confirm("Are you sure you want to delete this order?")) return;
+
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:5000/api/orders/${orderId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setOrders((prev) => prev.filter(o => o._id !== orderId));
+      setFilteredOrders((prev) => prev.filter(o => o._id !== orderId));
+      toast.success('Order deleted successfully');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to delete order');
+    }
+  };
+
   return (
     <div>
       <Navbar />
@@ -249,92 +319,125 @@ function Order() {
         <div className="main-container mb-3">
           {/* Left filter panel */}
           <div className="sidebar-area" style={{ display: showFilters ? 'block' : undefined }}>
+            <div className="filter-header-row mb-3 d-flex justify-content-between align-items-center">
+              <span className="fw-bold">Active Filters</span>
+              <button className="btn btn-sm btn-link p-0 text-primary fw-bold" onClick={resetAllFilters}>
+                CLEAR ALL
+              </button>
+            </div>
             <OrderFilter filters={filters} onFilterChange={handleFilterChange} />
           </div>
           <div className="content-area">
             <div className="search-section">
-              <div className="search-container">
+              <form
+                className="search-container"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  setDebouncedSearch(search.trim().toLowerCase());
+                }}
+              >
                 <input
                   type="text"
                   className="search-input"
-                  placeholder="Search by product, brand, category, or order status"
+                  placeholder="Search by Product, Brand, Category, Order ID or Status"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
                 <button
                   className="search-button"
-                  onClick={() => setDebouncedSearch(search.trim().toLowerCase())}
-                  type="button"
+                  type="submit"
                 >
                   <i className="las la-search"></i>
                   Search Orders
                 </button>
-              </div>
+              </form>
             </div>
             <div className="orders-container">
               {error ? (
                 <p style={{ color: 'red' }}>Error: {error}</p>
               ) : currentItems.length > 0 ? (
-                currentItems.flatMap((order) =>
-                  (order.items || []).map((item, index) => {
-                    const p = item.productId || {};
-                    const catName = resolveCategoryName(p);
-                    const brandName = p?.brand?.name || p?.brand || '';
-                    return (
-                      <div
-                        className="order-item"
-                        key={`${order._id}-${index}`}
-                        onClick={() => handleOrderClick(order._id)}
-                      >
-                        <div className="product-image">
-                          <img
-                            src={fileUrl(p?.image)}
-                            alt={p?.name || 'Product'}
-                            style={{ width: '60px', height: 'auto' }}
-                            onError={(e) => (e.currentTarget.src = '/no-image.png')}
-                          />
-                        </div>
-                        <div className="order-content">
-                          <div className="product-details">
-                            <div className="product-title">{p?.name || 'Unknown Product'}</div>
-                            <div className="product-color">
-                              {brandName && (
-                                <span style={{ marginRight: 8 }}>
-                                  <strong>Brand:</strong> {brandName}
-                                </span>
-                              )}
-                              {catName && (
-                                <span>
-                                  <strong>Category:</strong> {catName}
-                                </span>
-                              )}
+                <SwipeableList>
+                  {currentItems.flatMap((order) =>
+                    (order.items || []).map((item, index) => {
+                      const p = item.productId || {};
+                      const catName = resolveCategoryName(p);
+                      const brandName = p?.brand?.name || p?.brand || '';
+
+                      const trailingActions = () => (
+                        <TrailingActions>
+                          <SwipeAction
+                            destructive={true}
+                            onClick={() => handleDeleteOrder(order._id)}
+                          >
+                            <div style={{ backgroundColor: '#EF4444', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '0 25px', cursor: 'pointer', height: '100%', borderRadius: '12px', marginLeft: '10px' }}>
+                              <i className="las la-trash-alt" style={{ fontSize: '28px', marginBottom: '4px' }}></i>
+                              <span style={{ fontSize: '13px', fontWeight: '500' }}>Delete</span>
+                            </div>
+                          </SwipeAction>
+                        </TrailingActions>
+                      );
+
+                      return (
+                        <SwipeableListItem
+                          key={`${order._id}-${index}`}
+                          trailingActions={trailingActions()}
+                        >
+                          <div
+                            className="order-item"
+                            style={{ width: '100%', cursor: 'pointer' }}
+                            onClick={() => handleOrderClick(order._id)}
+                          >
+                            <div className="product-image">
+                              <img
+                                src={fileUrl(p?.image)}
+                                alt={p?.name || 'Product'}
+                                style={{ width: '60px', height: 'auto' }}
+                                onError={(e) => (e.currentTarget.src = '/no-image.png')}
+                              />
+                            </div>
+                            <div className="order-content">
+                              <div className="product-details">
+                                <div className="product-title">{p?.name || 'Unknown Product'}</div>
+                                <div className="product-color">
+                                  {brandName && (
+                                    <span style={{ marginRight: 8 }}>
+                                      <strong>Brand:</strong> {brandName}
+                                    </span>
+                                  )}
+                                  {catName && (
+                                    <span>
+                                      <strong>Category:</strong> {catName}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="product-price">₹{item.price}</div>
+                            <div className="order-status">
+                              <div className={`status-badge ${getStatusClass(order.status)}`}>
+                                <span className="status-dot"></span>
+                                {order.status}
+                              </div>
+                              <div className="status-description">
+                                {getStatusDescription(order)}
+                              </div>
+                              <div className="order-date">  
+                                {new Date(order.createdAt).toLocaleDateString()}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="product-price">₹{item.price}</div>
-                        <div className="order-status">
-                          <div className={`status-badge ${getStatusClass(order.status)}`}>
-                            <span className="status-dot"></span>
-                            {order.status}
-                          </div>
-                          <div className="status-description">
-                            {order.statusDescription || 'Your order has been placed.'}
-                          </div>
-                          <div className="order-date">
-                            {new Date(order.createdAt).toLocaleDateString()}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })
-                )
+                        </SwipeableListItem>
+                      );
+                    })
+                  )}
+                </SwipeableList>
               ) : (
-                <p>No orders found.</p>
+                <p>No orders found.</p> 
               )}
             </div>
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="pagination-container">
+              <div className="pagination-container mt-3">
                 <nav aria-label="Page navigation">
                   <ul className="pagination justify-content-end">
                     <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>

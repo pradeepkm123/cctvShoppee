@@ -1,6 +1,7 @@
 const Order = require("../models/Order");
 const mongoose = require("mongoose");
 const Product = require("../models/Product");
+const { createNotification } = require("./notificationController");
 const PDFDocument = require('pdfkit');
 const path = require('path');
 const fs = require('fs');
@@ -16,7 +17,7 @@ const fs = require('fs');
 //       paymentMethod,
 //       platform,
 //       awbNumber,
-//       channel,
+//       channel, 
 //       listPrice,
 //       sellingPrice,
 //       extraDiscount,
@@ -130,9 +131,18 @@ exports.createOrder = async (req, res) => {
 
     // ✅ Deduct stock for each item
     for (const item of items) {
+      const product = await Product.findById(item.productId);
+      if (!product) continue; // Should not happen due to validation loop above
+
+      const qtyRequested = parseInt(item.quantity) || 1;
+      const currentStock = product.stock || 0;
+      const newStock = currentStock - qtyRequested;
+
+      console.log(`[STK-DEDUCT] Order for ${userId}: Product ${product.name} (${item.productId}) | Old: ${currentStock}, New: ${newStock}`);
+
       await Product.findByIdAndUpdate(
         item.productId,
-        { $inc: { stock: -item.quantity } },
+        { $set: { stock: newStock } },
         { session }
       );
     }
@@ -179,6 +189,15 @@ exports.createOrder = async (req, res) => {
     await newOrder.save({ session });
     await session.commitTransaction();
 
+    // Send notification to user
+    await createNotification(
+      userId,
+      "Order Placed Success",
+      `Your order #${newOrder._id.toString().slice(-6)} has been placed successfully.`,
+      "Order",
+      `/order-details/${newOrder._id}`
+    );
+
     res.status(201).json({
       success: true,
       message: "Order created successfully and stock updated",
@@ -199,7 +218,7 @@ exports.getUserOrders = async (req, res) => {
   try {
     const userId = req.user.userId;
     const orders = await Order.find({ userId })
-      .populate("items.productId", "name image")
+      .populate("items.productId", "name image brand category")
       .sort({ createdAt: -1 })
       .lean();
     res.status(200).json(orders);
@@ -357,9 +376,29 @@ exports.addTimelineEntry = async (req, res) => {
 // ✅ Update order status
 exports.updateOrderStatus = async (req, res) => {
   try {
-    const { orderId } = req.params;
+    const orderId = req.params.orderId || req.body.orderId;
     const { status, note } = req.body;
-    const order = await Order.findByIdAndUpdate(
+
+    // Fetch order first to check previous status and get items
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    const previousStatus = order.status;
+
+    // If order is being cancelled now but was not cancelled before, restore stock
+    if (status === "Cancelled" && previousStatus !== "Cancelled") {
+      console.log(`[STK-RESTORE] Order ${orderId} cancelled, restoring stock...`);
+      for (const item of order.items) {
+        if (item.productId) {
+          await Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } });
+        }
+      }
+    }
+
+    // Update the order
+    const updatedOrder = await Order.findByIdAndUpdate(
       orderId,
       {
         status,
@@ -368,17 +407,38 @@ exports.updateOrderStatus = async (req, res) => {
             status,
             description: note || `Status updated to ${status}`,
             timestamp: new Date(),
-            color: "#8B5CF6",
+            color: status === "Delivered" ? "#10B981" : status === "Cancelled" ? "#EF4444" : "#8B5CF6",
             user: req.user?.name || "System",
           },
         },
       },
       { new: true }
     );
-    if (!order) {
-      return res.status(404).json({ success: false, message: "Order not found" });
+
+    // ✅ Send specialized notifications
+    let notificationTitle = "Order Status Updated";
+    let notificationMessage = `Your order #${order._id.toString().slice(-6)} status is now ${status}.`;
+
+    if (status === "Delivered") {
+      notificationTitle = "Order Delivered";
+      notificationMessage = `Great news! Your order #${order._id.toString().slice(-6)} has been delivered. Enjoy your purchase!`;
+    } else if (status === "Cancelled") {
+      notificationTitle = "Order Cancelled";
+      notificationMessage = `Your order #${order._id.toString().slice(-6)} has been cancelled. ${note || ""}`;
+    } else if (status === "Shipped") {
+      notificationTitle = "Order Shipped";
+      notificationMessage = `Your order #${order._id.toString().slice(-6)} has been shipped and is on its way!`;
     }
-    res.json({ success: true, order });
+
+    await createNotification(
+      order.userId,
+      notificationTitle,
+      notificationMessage,
+      "Order",
+      `/order-details/${order._id}`
+    );
+
+    res.json({ success: true, order: updatedOrder });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -416,8 +476,21 @@ exports.handlePayment = async (req, res) => {
 exports.processRefund = async (req, res) => {
   try {
     const { refundAmount, refundReason } = req.body;
-    const { orderId } = req.params;
-    const order = await Order.findByIdAndUpdate(
+    const orderId = req.params.orderId || req.body.orderId;
+
+    const order = await Order.findById(orderId).populate("items.productId");
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    // ✅ Restore product stock if not already restored
+    // (Logic: If we are processing a refund, we assume the items are back or order is void)
+    for (const item of order.items) {
+      if (item.productId && item.productId._id) {
+        console.log(`[STK-RESTORE] Refund Processed: Restoring ${item.quantity} to Product ${item.productId._id}`);
+        await Product.findByIdAndUpdate(item.productId._id, { $inc: { stock: item.quantity } });
+      }
+    }
+
+    const updatedOrder = await Order.findByIdAndUpdate(
       orderId,
       {
         paymentStatus: "Refunded",
@@ -433,8 +506,17 @@ exports.processRefund = async (req, res) => {
       },
       { new: true }
     );
-    if (!order) return res.status(404).json({ message: "Order not found" });
-    res.json(order);
+
+    // ✅ Send Refund Notification
+    await createNotification(
+      order.userId,
+      "Refund Processed",
+      `A refund of ₹${refundAmount} has been processed for your order #${order._id.toString().slice(-6)}.`,
+      "Order",
+      `/order-details/${order._id}`
+    );
+
+    res.json(updatedOrder);
   } catch (error) {
     res.status(500).json({ message: "Refund error", error: error.message });
   }
@@ -523,7 +605,7 @@ exports.cancelOrder = async (req, res) => {
   session.startTransaction();
   try {
     const { reason, otherReason, additionalComments } = req.body;
-    const { orderId } = req.params;
+    const orderId = req.params.orderId || req.body.orderId;
 
     if (!reason)
       return res.status(400).json({ success: false, message: "Reason is required" });
@@ -536,11 +618,14 @@ exports.cancelOrder = async (req, res) => {
 
     // Restore stock
     for (const item of order.items) {
-      await Product.findByIdAndUpdate(
-        item.productId._id,
-        { $inc: { stock: item.quantity } },
-        { session }
-      );
+      if (item.productId && item.productId._id) {
+        console.log(`[STK-RESTORE] Cancel Order ${orderId}: Restoring ${item.quantity} to Product ${item.productId._id}`);
+        await Product.findByIdAndUpdate(
+          item.productId._id,
+          { $inc: { stock: item.quantity } },
+          { session }
+        );
+      }
     }
 
     // Update order
@@ -571,6 +656,15 @@ exports.cancelOrder = async (req, res) => {
     );
 
     await session.commitTransaction();
+
+    // Send notification to user
+    await createNotification(
+      order.userId,
+      "Order Cancelled",
+      `Your order #${order._id.toString().slice(-6)} has been cancelled successfully.`,
+      "Order",
+      `/order-details/${order._id}`
+    );
     res.json({
       success: true,
       message: "Order cancelled successfully",
@@ -644,6 +738,15 @@ exports.requestReturnOrder = async (req, res) => {
     });
 
     const updatedOrder = await order.save();
+
+    // Send notification to user
+    await createNotification(
+      order.userId,
+      "Return Request Received",
+      `Your return request for order #${order._id.toString().slice(-6)} has been received and is under review.`,
+      "Order",
+      `/order-details/${order._id}`
+    );
     console.log("✅ Saved Return Request:", updatedOrder.returnRequest);
 
     res.json({
@@ -761,6 +864,15 @@ exports.updateReturnStatus = async (req, res) => {
         },
       },
       { new: true }
+    );
+
+    // Send notification to user
+    await createNotification(
+      order.userId,
+      "Return Status Updated",
+      `Your return request for order #${order._id.toString().slice(-6)} has been ${returnStatus}. ${adminNotes || ""}`,
+      "Order",
+      `/order-details/${order._id}`
     );
 
     res.json({
@@ -1006,5 +1118,28 @@ exports.downloadInvoice = async (req, res) => {
   } catch (error) {
     console.error('Error generating invoice:', error);
     res.status(500).json({ message: 'Failed to generate invoice', error: error.message });
+  }
+};
+
+// ✅ Delete order (User)
+exports.deleteOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    if (order.userId.toString() !== req.user.id.toString() && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Not authorized' });
+    }
+
+    await Order.findByIdAndDelete(orderId);
+
+    res.json({ success: true, message: 'Order deleted successfully' });
+  } catch (error) {
+    console.error('Delete order error:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete order' });
   }
 };

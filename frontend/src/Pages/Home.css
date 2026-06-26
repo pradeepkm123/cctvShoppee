@@ -53,9 +53,11 @@
 #one {
     background-image: url(../assets/img/c1.jpg);
 }
+
 #two {
     background-image: url(../assets/img/f1.jpg);
 }
+
 #three {
     background-image: url(../assets/img/s1.jpg);
 }
@@ -343,6 +345,6 @@ header {
     border-radius: 10px;
 }
 
-.nice-select{
+.nice-select {
     width: -webkit-fill-available;
 }

@@ -28,12 +28,10 @@
 .hb-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 0.55) 0%,
-    rgba(0, 0, 0, 0.25) 40%,
-    rgba(0, 0, 0, 0.0) 70%
-  );
+  background: linear-gradient(90deg,
+      rgba(0, 0, 0, 0.55) 0%,
+      rgba(0, 0, 0, 0.25) 40%,
+      rgba(0, 0, 0, 0.0) 70%);
   pointer-events: none;
 }
 
@@ -62,8 +60,8 @@
   text-transform: uppercase;
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(255,255,255,.15);
-  border: 1px solid rgba(255,255,255,.35);
+  background: rgba(255, 255, 255, .15);
+  border: 1px solid rgba(255, 255, 255, .35);
   backdrop-filter: blur(4px);
   margin-bottom: 4px;
 }
@@ -104,7 +102,7 @@
   background: #ffff;
   color: #111827;
   font-weight: 600;
-  border: 1px solid rgba(255,255,255,.4);
+  border: 1px solid rgba(255, 255, 255, .4);
   text-decoration: none;
   transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
 }
@@ -116,7 +114,7 @@
 
 .hb-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* Swiper arrows */
@@ -126,7 +124,7 @@
   width: 42px;
   height: 42px;
   border-radius: 999px;
-  background: rgba(0,0,0,0.25);
+  background: rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(6px);
 }
 
@@ -138,16 +136,17 @@
 
 .swiper-button-prev:hover,
 .swiper-button-next:hover {
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
 }
 
 /* Dots */
 .swiper-pagination-bullet {
   width: 8px;
   height: 8px;
-  background: rgba(255,255,255,.7);
+  background: rgba(255, 255, 255, .7);
   opacity: 1;
 }
+
 .swiper-pagination-bullet-active {
   width: 22px;
   border-radius: 999px;
@@ -157,24 +156,23 @@
 /* Small screens: soften overlay for readability */
 @media (max-width: 640px) {
   .hb-overlay {
-    background: linear-gradient(
-      180deg,
-      rgba(0,0,0,.55) 0%,
-      rgba(0,0,0,.15) 60%,
-      rgba(0,0,0,0) 100%
-    );
+    background: linear-gradient(180deg,
+        rgba(0, 0, 0, .55) 0%,
+        rgba(0, 0, 0, .15) 60%,
+        rgba(0, 0, 0, 0) 100%);
   }
 }
 
 
 .tp-product-tab .nav-tabs .nav-item .nav-link.active .tp-product-tab-line {
-    opacity: 1;
-    visibility: hidden;
-}
-.tp-section-title svg{
-  visibility: hidden;
-}
-.tp-theme-settings{
+  opacity: 1;
   visibility: hidden;
 }
 
+.tp-section-title svg {
+  visibility: hidden;
+}
+
+.tp-theme-settings {
+  visibility: hidden;
+}

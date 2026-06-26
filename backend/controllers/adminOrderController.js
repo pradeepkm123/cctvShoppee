@@ -1,4 +1,5 @@
 const Order = require('../models/Order');
+const { createNotification } = require('./notificationController');
 
 // Get all orders (Admin)
 exports.getAllOrders = async (req, res) => {
@@ -34,6 +35,16 @@ exports.updateOrderStatus = async (req, res) => {
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
+
+    // Send notification to user
+    await createNotification(
+      order.userId,
+      "Order Status Updated",
+      `Your order #${order._id.toString().slice(-6)} is now ${status}. ${note || ""}`,
+      "Order",
+      `/order-details/${order._id}`
+    );
+
     res.json(order);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -61,6 +72,16 @@ exports.processRefund = async (req, res) => {
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
+
+    // Send notification to user
+    await createNotification(
+      order.userId,
+      "Refund Processed",
+      `A refund of ₹${refundAmount} has been processed for your order #${order._id.toString().slice(-6)}.`,
+      "Order",
+      `/order-details/${order._id}`
+    );
+
     res.json(order);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -88,6 +109,16 @@ exports.cancelOrder = async (req, res) => {
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
+
+    // Send notification to user
+    await createNotification(
+      order.userId,
+      "Order Cancelled",
+      `Your order #${order._id.toString().slice(-6)} has been cancelled by the administrator. Reason: ${reason}`,
+      "Order",
+      `/order-details/${order._id}`
+    );
+
     res.json(order);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

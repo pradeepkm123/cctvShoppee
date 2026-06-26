@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 const StoreCustomizations = () => {
     const [activeTab, setActiveTab] = useState('Home Page');
     const [activeSlider, setActiveSlider] = useState('Slider 1');
-    
+
     // Home Page Slides State
     const [slides, setSlides] = useState([]);
     const [currentSlide, setCurrentSlide] = useState({
@@ -17,7 +17,7 @@ const StoreCustomizations = () => {
         badge: ''
     });
     const [uploading, setUploading] = useState(false);
-    
+
     // Clients State
     const [clients, setClients] = useState([]);
     const [currentClient, setCurrentClient] = useState({
@@ -27,13 +27,34 @@ const StoreCustomizations = () => {
     });
     const [uploadingClient, setUploadingClient] = useState(false);
 
-    const API_BASE = 'https://cctvshoppee.onrender.com';
+    // Popup Ad State
+    const [popups, setPopups] = useState([]);
+    const [loadingPopups, setLoadingPopups] = useState(true);
+    const [currentPopup, setCurrentPopup] = useState({
+        _id: null,
+        title: '',
+        link: '/',
+        status: true,
+        startDate: '',
+        endDate: ''
+    });
+    const [uploadingPopup, setUploadingPopup] = useState(false);
 
-    const tabs = ['Home Page', 'Client'];
+    const API_BASE = (process.env.REACT_APP_API_BASE || 'http://localhost:5000').replace(/\/api$/, '');
+
+    const toAbsUrl = (path) => {
+        if (!path) return '';
+        if (path.startsWith('http')) return path;
+        const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+        return `${API_BASE}/${cleanPath}`;
+    };
+
+    const tabs = ['Home Page', 'Client', 'Popup Ads'];
 
     useEffect(() => {
         fetchSlides();
         fetchClients();
+        fetchPopups();
     }, []);
 
     // Home Page Slides Functions
@@ -49,20 +70,24 @@ const StoreCustomizations = () => {
         }
     };
 
-    const handleImageUpload = async (event, slideId = null) => {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-        if (!allowedTypes.includes(file.type)) {
-            alert('Please select a valid image file (JPEG, PNG, or WebP)');
+    const handleSaveSlide = async () => {
+        if (!currentSlide.title) {
+            alert('Please enter a title');
             return;
         }
 
         const formData = new FormData();
-        formData.append('image', file);
+        // Append image if any
+        const fileInput = document.getElementById('slide-image');
+        if (fileInput && fileInput.files[0]) {
+            formData.append('image', fileInput.files[0]);
+        } else if (!currentSlide._id) {
+            alert('Please select an image for the new slide');
+            return;
+        }
+
         Object.keys(currentSlide).forEach(key => {
-            if (currentSlide[key] !== undefined && currentSlide[key] !== null) {
+            if (key !== '_id' && key !== 'image' && currentSlide[key] !== undefined && currentSlide[key] !== null) {
                 formData.append(key, currentSlide[key]);
             }
         });
@@ -70,8 +95,8 @@ const StoreCustomizations = () => {
 
         setUploading(true);
         try {
-            const url = slideId ? `${API_BASE}/api/slides/${slideId}` : `${API_BASE}/api/slides`;
-            const method = slideId ? 'PUT' : 'POST';
+            const url = currentSlide._id ? `${API_BASE}/api/slides/${currentSlide._id}` : `${API_BASE}/api/slides`;
+            const method = currentSlide._id ? 'PUT' : 'POST';
             const response = await fetch(url, {
                 method,
                 body: formData,
@@ -80,17 +105,35 @@ const StoreCustomizations = () => {
             if (result.success) {
                 await fetchSlides();
                 resetForm();
-                alert(slideId ? 'Slide updated successfully!' : 'Slide created successfully!');
+                if (fileInput) fileInput.value = '';
+                alert(currentSlide._id ? 'Slide updated successfully!' : 'Slide created successfully!');
             } else {
                 alert('Error: ' + result.message);
             }
         } catch (error) {
-            console.error('Error uploading image:', error);
-            alert('Network error: Unable to upload image');
+            console.error('Error saving slide:', error);
+            alert('Network error: Unable to save slide');
         } finally {
             setUploading(false);
-            event.target.value = '';
         }
+    };
+
+    const handleEditSlide = (slide) => {
+        setCurrentSlide({
+            _id: slide._id,
+            eyebrow: slide.eyebrow || '',
+            title: slide.title || '',
+            blurb: slide.blurb || '',
+            ctaText: slide.ctaText || 'Shop Now',
+            ctaHref: slide.ctaHref || '/',
+            backgroundColor: slide.backgroundColor || '',
+            lightText: slide.lightText !== false,
+            badge: slide.badge || '',
+            order: slide.order || 0
+        });
+        // Scroll to form
+        const form = document.querySelector('.add-new-slide-form');
+        if (form) form.scrollIntoView({ behavior: 'smooth' });
     };
 
     const handleDeleteSlide = async (slideId) => {
@@ -113,6 +156,7 @@ const StoreCustomizations = () => {
 
     const resetForm = () => {
         setCurrentSlide({
+            _id: null,
             eyebrow: '',
             title: '',
             blurb: '',
@@ -144,20 +188,23 @@ const StoreCustomizations = () => {
         }
     };
 
-    const handleClientImageUpload = async (event, clientId = null) => {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/svg+xml'];
-        if (!allowedTypes.includes(file.type)) {
-            alert('Please select a valid image file (JPEG, PNG, WebP, or SVG)');
+    const handleSaveClient = async () => {
+        if (!currentClient.name) {
+            alert('Please enter a client name');
             return;
         }
 
         const formData = new FormData();
-        formData.append('image', file);
+        const fileInput = document.getElementById('client-image');
+        if (fileInput && fileInput.files[0]) {
+            formData.append('image', fileInput.files[0]);
+        } else if (!currentClient._id) {
+            alert('Please select a logo for the new client');
+            return;
+        }
+
         Object.keys(currentClient).forEach(key => {
-            if (currentClient[key] !== undefined && currentClient[key] !== null) {
+            if (key !== '_id' && key !== 'image' && currentClient[key] !== undefined && currentClient[key] !== null) {
                 formData.append(key, currentClient[key]);
             }
         });
@@ -165,8 +212,8 @@ const StoreCustomizations = () => {
 
         setUploadingClient(true);
         try {
-            const url = clientId ? `${API_BASE}/api/clients/${clientId}` : `${API_BASE}/api/clients`;
-            const method = clientId ? 'PUT' : 'POST';
+            const url = currentClient._id ? `${API_BASE}/api/clients/${currentClient._id}` : `${API_BASE}/api/clients`;
+            const method = currentClient._id ? 'PUT' : 'POST';
             const response = await fetch(url, {
                 method,
                 body: formData,
@@ -175,17 +222,28 @@ const StoreCustomizations = () => {
             if (result.success) {
                 await fetchClients();
                 resetClientForm();
-                alert(clientId ? 'Client updated successfully!' : 'Client created successfully!');
+                if (fileInput) fileInput.value = '';
+                alert(currentClient._id ? 'Client updated successfully!' : 'Client created successfully!');
             } else {
                 alert('Error: ' + result.message);
             }
         } catch (error) {
-            console.error('Error uploading client image:', error);
-            alert('Network error: Unable to upload client logo');
+            console.error('Error saving client:', error);
+            alert('Network error: Unable to save client');
         } finally {
             setUploadingClient(false);
-            event.target.value = '';
         }
+    };
+
+    const handleEditClient = (client) => {
+        setCurrentClient({
+            _id: client._id,
+            name: client.name || '',
+            websiteUrl: client.websiteUrl || '#',
+            altText: client.altText || ''
+        });
+        const form = document.querySelector('.add-new-client-form');
+        if (form) form.scrollIntoView({ behavior: 'smooth' });
     };
 
     const handleDeleteClient = async (clientId) => {
@@ -215,9 +273,122 @@ const StoreCustomizations = () => {
 
     const resetClientForm = () => {
         setCurrentClient({
+            _id: null,
             name: '',
             websiteUrl: '#',
             altText: ''
+        });
+    };
+
+    // Popup Ad Functions
+    const fetchPopups = async () => {
+        try {
+            setLoadingPopups(true);
+            const response = await fetch(`${API_BASE}/api/popups`);
+            const result = await response.json();
+            if (result.success) {
+                setPopups(result.data);
+            }
+        } catch (error) {
+            console.error('Error fetching popups:', error);
+        } finally {
+            setLoadingPopups(false);
+        }
+    };
+
+    const handleSavePopup = async () => {
+        if (!currentPopup.title) {
+            alert('Please enter a title');
+            return;
+        }
+
+        const formData = new FormData();
+        const fileInput = document.getElementById('popup-image');
+        if (fileInput && fileInput.files[0]) {
+            formData.append('image', fileInput.files[0]);
+        } else if (!currentPopup._id) {
+            alert('Please select an image for the new popup');
+            return;
+        }
+
+        Object.keys(currentPopup).forEach(key => {
+            if (key !== '_id' && key !== 'image' && currentPopup[key] !== undefined && currentPopup[key] !== null) {
+                formData.append(key, currentPopup[key]);
+            }
+        });
+        formData.append('storeId', 'default');
+
+        setUploadingPopup(true);
+        try {
+            const url = currentPopup._id ? `${API_BASE}/api/popups/${currentPopup._id}` : `${API_BASE}/api/popups`;
+            const method = currentPopup._id ? 'PUT' : 'POST';
+            const response = await fetch(url, {
+                method,
+                body: formData,
+            });
+            const result = await response.json();
+            if (result.success) {
+                await fetchPopups();
+                resetPopupForm();
+                if (fileInput) fileInput.value = '';
+                alert(currentPopup._id ? 'Popup updated successfully!' : 'Popup created successfully!');
+            } else {
+                alert('Error: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error saving popup:', error);
+            alert('Network error: Unable to save popup');
+        } finally {
+            setUploadingPopup(false);
+        }
+    };
+
+    const handleEditPopup = (popup) => {
+        setCurrentPopup({
+            _id: popup._id,
+            title: popup.title || '',
+            link: popup.link || '/',
+            status: popup.status !== false,
+            startDate: popup.startDate ? new Date(popup.startDate).toISOString().split('T')[0] : '',
+            endDate: popup.endDate ? new Date(popup.endDate).toISOString().split('T')[0] : ''
+        });
+        const form = document.querySelector('.add-new-popup-form');
+        if (form) form.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const handleDeletePopup = async (popupId) => {
+        if (!window.confirm('Are you sure you want to delete this popup?')) return;
+        try {
+            const response = await fetch(`${API_BASE}/api/popups/${popupId}`, {
+                method: 'DELETE',
+            });
+            const result = await response.json();
+            if (result.success) {
+                await fetchPopups();
+            } else {
+                alert('Error deleting popup: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error deleting popup:', error);
+            alert('Error deleting popup');
+        }
+    };
+
+    const handlePopupInputChange = (field, value) => {
+        setCurrentPopup(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    const resetPopupForm = () => {
+        setCurrentPopup({
+            _id: null,
+            title: '',
+            link: '/',
+            status: true,
+            startDate: '',
+            endDate: ''
         });
     };
 
@@ -277,10 +448,10 @@ const StoreCustomizations = () => {
                                     <p className="no-items">No slides available. Create your first slide below.</p>
                                 ) : (
                                     slides.map((slide, index) => (
-                                        <div key={slide._id} className="slide-preview-item">
+                                        <div key={slide._id} className="slide-preview-item" onClick={() => handleEditSlide(slide)} style={{ cursor: 'pointer' }}>
                                             <div className="uploaded-image">
                                                 <img
-                                                    src={`${API_BASE}${slide.image}`}
+                                                    src={toAbsUrl(slide.image)}
                                                     alt={slide.title}
                                                     onError={(e) => {
                                                         e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="60"%3E%3Crect fill="%23f0f0f0" width="100" height="60"/%3E%3C/svg%3E';
@@ -288,7 +459,7 @@ const StoreCustomizations = () => {
                                                 />
                                                 <button
                                                     className="remove-btn-small"
-                                                    onClick={() => handleDeleteSlide(slide._id)}
+                                                    onClick={(e) => { e.stopPropagation(); handleDeleteSlide(slide._id); }}
                                                     title="Delete slide"
                                                 >
                                                     ×
@@ -306,9 +477,9 @@ const StoreCustomizations = () => {
                         </div>
 
                         {/* Add New Slide Form */}
-                        <div className="form-group">
-                            <label>Add New Slide</label>
-                            
+                        <div className="form-group add-new-slide-form">
+                            <label>{currentSlide._id ? 'Edit Slide' : 'Add New Slide'}</label>
+
                             <div className="input-group">
                                 <label>Title *</label>
                                 <input
@@ -402,20 +573,25 @@ const StoreCustomizations = () => {
                             </div>
 
                             <div className="form-group">
-                                <label>Slider Image *</label>
+                                <label>Slider Image {currentSlide._id ? '(Leave blank to keep existing)' : '*'}</label>
                                 <div className="upload-area">
                                     <input
                                         type="file"
                                         id="slide-image"
                                         accept=".jpeg,.jpg,.png,.webp"
-                                        onChange={handleImageUpload}
                                         style={{ display: 'none' }}
                                         disabled={uploading || !currentSlide.title}
+                                        onChange={(e) => {
+                                            // Optional: show preview
+                                            if (e.target.files[0]) {
+                                                console.log('File selected:', e.target.files[0].name);
+                                            }
+                                        }}
                                     />
                                     <label htmlFor="slide-image" className="upload-label">
                                         <div className="upload-icon">↑</div>
                                         <p className="upload-text">
-                                            {uploading ? 'Uploading...' : 'Click to upload image'}
+                                            Click to select image
                                         </p>
                                         <p className="upload-hint">(Only *.jpeg, *.webp and *.png images will be accepted)</p>
                                         {!currentSlide.title && (
@@ -425,6 +601,26 @@ const StoreCustomizations = () => {
                                         )}
                                     </label>
                                 </div>
+                            </div>
+
+                            <div className="form-actions" style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                                <button
+                                    className="update-btn"
+                                    style={{ position: 'static', flex: 1 }}
+                                    onClick={handleSaveSlide}
+                                    disabled={uploading}
+                                >
+                                    {uploading ? 'Saving...' : (currentSlide._id ? 'Update Slide' : 'Create Slide')}
+                                </button>
+                                {currentSlide._id && (
+                                    <button
+                                        className="update-btn"
+                                        style={{ position: 'static', background: '#6b7280' }}
+                                        onClick={resetForm}
+                                    >
+                                        Cancel
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -446,10 +642,10 @@ const StoreCustomizations = () => {
                                     <p className="no-items">No client logos available. Add your first client logo below.</p>
                                 ) : (
                                     clients.map((client) => (
-                                        <div key={client._id} className="slide-preview-item">
+                                        <div key={client._id} className="slide-preview-item" onClick={() => handleEditClient(client)} style={{ cursor: 'pointer' }}>
                                             <div className="uploaded-image">
                                                 <img
-                                                    src={`${API_BASE}${client.image}`}
+                                                    src={toAbsUrl(client.image)}
                                                     alt={client.name}
                                                     style={{ width: '100px', height: '60px', objectFit: 'contain' }}
                                                     onError={(e) => {
@@ -458,7 +654,7 @@ const StoreCustomizations = () => {
                                                 />
                                                 <button
                                                     className="remove-btn-small"
-                                                    onClick={() => handleDeleteClient(client._id)}
+                                                    onClick={(e) => { e.stopPropagation(); handleDeleteClient(client._id); }}
                                                     title="Delete client"
                                                 >
                                                     ×
@@ -476,9 +672,9 @@ const StoreCustomizations = () => {
                         </div>
 
                         {/* Add New Client Form */}
-                        <div className="form-group">
-                            <label>Add New Client Logo</label>
-                            
+                        <div className="form-group add-new-client-form">
+                            <label>{currentClient._id ? 'Edit Client Logo' : 'Add New Client Logo'}</label>
+
                             <div className="input-group">
                                 <label>Client Name *</label>
                                 <input
@@ -514,20 +710,24 @@ const StoreCustomizations = () => {
                             </div>
 
                             <div className="form-group">
-                                <label>Client Logo Image *</label>
+                                <label>Client Logo Image {currentClient._id ? '(Leave blank to keep existing)' : '*'}</label>
                                 <div className="upload-area">
                                     <input
                                         type="file"
                                         id="client-image"
                                         accept=".jpeg,.jpg,.png,.webp,.svg"
-                                        onChange={handleClientImageUpload}
                                         style={{ display: 'none' }}
                                         disabled={uploadingClient || !currentClient.name}
+                                        onChange={(e) => {
+                                            if (e.target.files[0]) {
+                                                console.log('File selected:', e.target.files[0].name);
+                                            }
+                                        }}
                                     />
                                     <label htmlFor="client-image" className="upload-label">
                                         <div className="upload-icon">↑</div>
                                         <p className="upload-text">
-                                            {uploadingClient ? 'Uploading...' : 'Click to upload client logo'}
+                                            Click to select client logo
                                         </p>
                                         <p className="upload-hint">(Only *.jpeg, *.webp, *.png, and *.svg images will be accepted)</p>
                                         {!currentClient.name && (
@@ -537,6 +737,191 @@ const StoreCustomizations = () => {
                                         )}
                                     </label>
                                 </div>
+                            </div>
+
+                            <div className="form-actions" style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                                <button
+                                    className="update-btn"
+                                    style={{ position: 'static', flex: 1 }}
+                                    onClick={handleSaveClient}
+                                    disabled={uploadingClient}
+                                >
+                                    {uploadingClient ? 'Saving...' : (currentClient._id ? 'Update Client' : 'Add Client')}
+                                </button>
+                                {currentClient._id && (
+                                    <button
+                                        className="update-btn"
+                                        style={{ position: 'static', background: '#6b7280' }}
+                                        onClick={resetClientForm}
+                                    >
+                                        Cancel
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Popup Ads Tab */}
+                {activeTab === 'Popup Ads' && (
+                    <div className="section">
+                        <div className="section-header">
+                            <span className="icon">📢</span>
+                            <h2>Popup Ads Management</h2>
+                        </div>
+
+                        {/* Existing Popups Preview */}
+                        <div className="form-group">
+                            <label>Existing Popup Ads ({popups.length})</label>
+                            <div className="slides-preview">
+                                {loadingPopups ? (
+                                    <p className="no-items">Loading popups...</p>
+                                ) : popups.length === 0 ? (
+                                    <p className="no-items">No popup ads available. Create your first popup below.</p>
+                                ) : (
+                                    popups.map((popup) => (
+                                        <div key={popup._id} className="slide-preview-item" onClick={() => handleEditPopup(popup)} style={{ cursor: 'pointer' }}>
+                                            <div className="uploaded-image">
+                                                <img
+                                                    src={toAbsUrl(popup.image)}
+                                                    alt={popup.title}
+                                                    style={{ width: '100px', height: '100px', objectFit: 'contain' }}
+                                                    onError={(e) => {
+                                                        e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23f0f0f0" width="100" height="100"/%3E%3C/svg%3E';
+                                                    }}
+                                                />
+                                                <button
+                                                    className="remove-btn-small"
+                                                    onClick={(e) => { e.stopPropagation(); handleDeletePopup(popup._id); }}
+                                                    title="Delete popup"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                            <div className="slide-info">
+                                                <p><strong>{popup.title}</strong></p>
+                                                <p><span className={`status-tag ${popup.status ? 'active' : 'inactive'}`} style={{
+                                                    fontSize: '10px',
+                                                    padding: '2px 6px',
+                                                    borderRadius: '10px',
+                                                    background: popup.status ? '#d1fae5' : '#fee2e2',
+                                                    color: popup.status ? '#065f46' : '#991b1b'
+                                                }}>
+                                                    {popup.status ? 'Active' : 'Inactive'}
+                                                </span></p>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Add New Popup Form */}
+                        <div className="form-group add-new-popup-form">
+                            <label>{currentPopup._id ? 'Edit Popup Ad' : 'Create New Popup Ad'}</label>
+
+                            <div className="input-group">
+                                <label>Popup Title *</label>
+                                <input
+                                    type="text"
+                                    className="input-field"
+                                    value={currentPopup.title}
+                                    onChange={(e) => handlePopupInputChange('title', e.target.value)}
+                                    placeholder="e.g., PoE Splitter Offer"
+                                    required
+                                />
+                            </div>
+
+                            <div className="input-group">
+                                <label>Target Link (URL)</label>
+                                <input
+                                    type="text"
+                                    className="input-field"
+                                    value={currentPopup.link}
+                                    onChange={(e) => handlePopupInputChange('link', e.target.value)}
+                                    placeholder="e.g., /product/65..."
+                                />
+                            </div>
+
+                            <div className="input-group" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <label style={{ marginBottom: 0 }}>Active Status</label>
+                                <label className="toggle">
+                                    <input
+                                        type="checkbox"
+                                        checked={currentPopup.status}
+                                        onChange={(e) => handlePopupInputChange('status', e.target.checked)}
+                                    />
+                                    <span className="toggle-slider"></span>
+                                </label>
+                                <span className="toggle-label">
+                                    {currentPopup.status ? 'Shown' : 'Hidden'}
+                                </span>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '15px' }}>
+                                <div className="input-group" style={{ flex: 1 }}>
+                                    <label>Start Date (Optional)</label>
+                                    <input
+                                        type="date"
+                                        className="input-field"
+                                        value={currentPopup.startDate}
+                                        onChange={(e) => handlePopupInputChange('startDate', e.target.value)}
+                                    />
+                                </div>
+                                <div className="input-group" style={{ flex: 1 }}>
+                                    <label>End Date (Optional)</label>
+                                    <input
+                                        type="date"
+                                        className="input-field"
+                                        value={currentPopup.endDate}
+                                        onChange={(e) => handlePopupInputChange('endDate', e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Popup Banner Image {currentPopup._id ? '(Leave blank to keep existing)' : '*'}</label>
+                                <div className="upload-area">
+                                    <input
+                                        type="file"
+                                        id="popup-image"
+                                        accept=".jpeg,.jpg,.png,.webp"
+                                        style={{ display: 'none' }}
+                                        disabled={uploadingPopup || !currentPopup.title}
+                                    />
+                                    <label htmlFor="popup-image" className="upload-label">
+                                        <div className="upload-icon">↑</div>
+                                        <p className="upload-text">
+                                            Click to select banner
+                                        </p>
+                                        <p className="upload-hint">(Recommended: 400x400 or 500x500px square image)</p>
+                                        {!currentPopup.title && (
+                                            <p className="upload-warning" style={{ color: '#ef4444', fontSize: '12px', marginTop: '5px' }}>
+                                                * Please enter a title first
+                                            </p>
+                                        )}
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="form-actions" style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                                <button
+                                    className="update-btn"
+                                    style={{ position: 'static', flex: 1 }}
+                                    onClick={handleSavePopup}
+                                    disabled={uploadingPopup}
+                                >
+                                    {uploadingPopup ? 'Saving...' : (currentPopup._id ? 'Update Popup' : 'Create Popup')}
+                                </button>
+                                {currentPopup._id && (
+                                    <button
+                                        className="update-btn"
+                                        style={{ position: 'static', background: '#6b7280' }}
+                                        onClick={resetPopupForm}
+                                    >
+                                        Cancel
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -648,6 +1033,20 @@ const StoreCustomizations = () => {
                 }
                 .form-group {
                   margin-bottom: 25px;
+                }
+                .status-tag {
+                  display: inline-block;
+                  font-weight: 500;
+                  text-transform: uppercase;
+                  letter-spacing: 0.025em;
+                }
+                .status-tag.active {
+                  background: #d1fae5;
+                  color: #065f46;
+                }
+                .status-tag.inactive {
+                  background: #fee2e2;
+                  color: #991b1b;
                 }
                 .form-group h3 {
                   font-size: 15px;

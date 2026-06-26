@@ -266,12 +266,45 @@ function OrderDetails() {
         };
     };
 
+    // Helper: safely resolve product image URL
+    const resolveImg = (img) => {
+        if (!img) return 'https://via.placeholder.com/100?text=No+Image';
+        if (img.startsWith('http')) return img;
+        const cleaned = img.split('/').pop();
+        return `http://localhost:5000/uploads/${cleaned}`;
+    };
+
+    // Helper: nicely format price
+    const fmt = (n) => {
+        if (!n && n !== 0) return null;
+        return Number(n).toLocaleString('en-IN');
+    };
+
+    // Get expected delivery date (7 days from order date)
+    const getExpectedDelivery = () => {
+        if (!order?.createdAt) return null;
+        const d = new Date(order.createdAt);
+        d.setDate(d.getDate() + 7);
+        return d.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' });
+    };
+
+    // Compute current step index for timeline
+    const currentStepIndex = deliveryStatusOrder.indexOf(currentStatus);
+
     // Check if order is delivered
     const isDelivered = currentStatus === 'Delivered';
 
-    if (isLoading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
-    if (!order) return <div>No order found.</div>;
+
+    if (isLoading) return (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+            <div style={{ textAlign: 'center' }}>
+                <div style={{ width: 48, height: 48, border: '4px solid #f0f0f0', borderTopColor: '#2874f0', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }} />
+                <p style={{ color: '#888' }}>Loading order details...</p>
+            </div>
+        </div>
+    );
+    if (error) return <div style={{ padding: 32, textAlign: 'center', color: '#e53935' }}>Error: {error}</div>;
+    if (!order) return <div style={{ padding: 32, textAlign: 'center' }}>No order found.</div>;
 
     return (
         <div>
@@ -301,140 +334,186 @@ function OrderDetails() {
                     </ol>
                 </nav>
                 <div className="row">
+                    {/* Left Column: Product + Timeline */}
                     <div className="col-lg-8 mb-4">
                         {order.items.map((item, index) => (
                             <div className="delivery-card p-4 mb-4" key={index}>
-                                <div className="row align-items-center">
-                                    <div className="col-md-8">
-                                        <h6 className="mb-2">{item.productId?.name || 'Product Name'}</h6>
-                                        <p className="text-muted small mb-1">Color: {item.color || 'Black'}</p>
-                                        <p className="text-muted small mb-1">Sold by: {item.seller || 'Nehru Fashion'}</p>
-                                        <p className="fw-bold mb-0">₹{item.price || '0'}</p>
+                                {/* Expected Delivery Banner */}
+                                {currentStatus !== 'Cancelled' && currentStatus !== 'Delivered' && (
+                                    <div style={{ background: '#f0f7ff', borderRadius: 6, padding: '10px 14px', marginBottom: 20, fontSize: 14, color: '#1976d2', fontWeight: 500 }}>
+                                        📦 Expected Delivery by <strong>{getExpectedDelivery()}</strong>
                                     </div>
-                                    <div className="col-md-4 text-center">
+                                )}
+                                {currentStatus === 'Cancelled' && (
+                                    <div style={{ background: '#fff3f3', borderRadius: 6, padding: '10px 14px', marginBottom: 20, fontSize: 14, color: '#c62828', fontWeight: 500 }}>
+                                        ❌ This order has been <strong>Cancelled</strong>
+                                    </div>
+                                )}
+                                {currentStatus === 'Delivered' && (
+                                    <div style={{ background: '#f0fff4', borderRadius: 6, padding: '10px 14px', marginBottom: 20, fontSize: 14, color: '#2e7d32', fontWeight: 500 }}>
+                                        ✅ This order has been <strong>Delivered</strong>
+                                    </div>
+                                )}
+                                <div className="row align-items-start">
+                                    <div className="col-md-7">
+                                        <h6 className="mb-2" style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.4 }}>{item.productId?.name || item.name || 'Product Name'}</h6>
+                                        <p className="text-muted small mb-1" style={{ fontSize: 12 }}>Color: <span style={{ color: '#212529' }}>{item.color || 'Black'}</span></p>
+                                        <p className="text-muted small mb-1" style={{ fontSize: 12 }}>Qty: <span style={{ color: '#212529' }}>{item.quantity || 1}</span></p>
+                                        <p className="text-muted small mb-2" style={{ fontSize: 12 }}>Sold by: <span style={{ color: '#2874f0' }}>{item.seller || 'CCTV Shoppee'}</span></p>
+                                        <p style={{ fontWeight: 700, fontSize: 18, color: '#212529', margin: 0 }}>₹{fmt(item.price) || '0'}</p>
+                                    </div>
+                                    <div className="col-md-5 text-center" style={{ position: 'relative' }}>
                                         <img
-                                            src={`https://cctvshoppee.onrender.com/uploads/${item.productId?.image || 'no-image.png'}`}
-                                            alt={item.productId?.name || 'Product'}
-                                            style={{ width: '100px', height: 'auto', objectFit: 'contain' }}
+                                            src={resolveImg(item.productId?.image)}
+                                            alt={item.productId?.name || item.name || 'Product'}
+                                            style={{ width: 110, height: 110, objectFit: 'contain', borderRadius: 8 }}
+                                            onError={(e) => { e.target.src = 'https://via.placeholder.com/100?text=No+Image'; }}
                                         />
                                     </div>
                                 </div>
                             </div>
                         ))}
+                        {/* Timeline Card */}
                         <div className="delivery-card p-4">
-                            <div className="status-timeline">
-                                {[...deliveryStatusOrder, ...(currentStatus === 'Return Requested' ? ['Return Requested'] : [])].map((status, index) => {
-                                    const allStatuses = [...deliveryStatusOrder, ...(currentStatus === 'Return Requested' ? ['Return Requested'] : [])];
-                                    const currentStatusIndex = allStatuses.indexOf(currentStatus);
-                                    const statusIndex = allStatuses.indexOf(status);
-                                    const isCompleted = statusIndex <= currentStatusIndex;
-                                    const isCurrent = status === currentStatus;
-                                    const isCancelled = order.status === 'Cancelled';
-                                    const isReturnRequested = status === 'Return Requested' && currentStatus === 'Return Requested';
-                                    const { description, timestamp } = getStatusDetails(status);
-                                    return (
-                                        <div className="status-item" key={index}>
-                                            <div
-                                                className={`status-icon ${isCancelled
-                                                    ? 'status-cancelled'
-                                                    : isReturnRequested
-                                                        ? 'status-returned'
-                                                        : isCompleted
-                                                            ? 'status-confirmed'
-                                                            : isCurrent
-                                                                ? 'status-active'
-                                                                : 'status-inactive'
-                                                    }`}
-                                            >
-                                                <i
-                                                    className={`las ${isCancelled
-                                                        ? 'la-times-circle'
-                                                        : isReturnRequested
-                                                            ? 'la-check-circle' // Same icon as completed/current statuses
-                                                            : isCompleted
-                                                                ? 'la-check-circle'
-                                                                : isCurrent
-                                                                    ? 'la-check-circle'
-                                                                    : 'la-circle'
-                                                        }`}
-                                                ></i>
+                            <h6 style={{ fontWeight: 700, marginBottom: 24, fontSize: 15 }}>Order Status</h6>
+                            {order.status === 'Cancelled' ? (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 0' }}>
+                                    <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                        <i className="las la-times-circle" style={{ fontSize: 22, color: '#c62828' }}></i>
+                                    </div>
+                                    <div>
+                                        <div style={{ fontWeight: 600, color: '#c62828', fontSize: 15 }}>Order Cancelled</div>
+                                        {order.cancellation?.reason && <small style={{ color: '#888' }}>Reason: {order.cancellation.reason}</small>}
+                                        <small style={{ color: '#888', display: 'block' }}>{order.cancellation?.cancelledAt ? new Date(order.cancellation.cancelledAt).toLocaleString() : ''}</small>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div style={{ position: 'relative' }}>
+                                    {deliveryStatusOrder.map((status, index) => {
+                                        const isCompleted = index <= currentStepIndex;
+                                        const isCurrent = status === currentStatus;
+                                        const { description, timestamp } = getStatusDetails(status);
+                                        return (
+                                            <div key={index} style={{ display: 'flex', gap: 16, position: 'relative', paddingBottom: index < deliveryStatusOrder.length - 1 ? 28 : 0 }}>
+                                                {/* Vertical connector line */}
+                                                {index < deliveryStatusOrder.length - 1 && (
+                                                    <div
+                                                        className={isCompleted ? 'timeline-line-done' : 'timeline-line-pending'}
+                                                        style={{
+                                                            position: 'absolute',
+                                                            left: 21,
+                                                            top: 44,
+                                                            width: 3,
+                                                            height: 'calc(100% - 16px)',
+                                                            zIndex: 0,
+                                                        }}
+                                                    />
+                                                )}
+                                                {/* Circle icon */}
+                                                <div
+                                                    className={isCurrent ? 'timeline-circle-active' : ''}
+                                                    style={{
+                                                        width: 44,
+                                                        height: 44,
+                                                        borderRadius: '50%',
+                                                        background: isCurrent ? '#26a541' : (isCompleted ? '#e8f5e9' : '#f5f5f5'),
+                                                        border: `2px solid ${isCompleted ? '#26a541' : '#e0e0e0'}`,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        flexShrink: 0,
+                                                        position: 'relative',
+                                                        zIndex: 1,
+                                                        transition: 'all 0.3s ease',
+                                                    }}
+                                                >
+                                                    <i className={`las ${isCompleted ? 'la-check' : 'la-clock'}`}
+                                                        style={{ fontSize: 18, color: isCompleted ? (isCurrent ? '#fff' : '#26a541') : '#bbb' }}
+                                                    />
+                                                </div>
+                                                {/* Text */}
+                                                <div style={{ paddingTop: 8 }}>
+                                                    <div style={{ fontWeight: isCurrent ? 700 : 500, color: isCurrent ? '#26a541' : (isCompleted ? '#212529' : '#aaa'), fontSize: 14 }}>{status}</div>
+                                                    {isCurrent && description && <small style={{ color: '#555', display: 'block', marginTop: 2 }}>{description}</small>}
+                                                    {isCurrent && timestamp && <small style={{ color: '#999', display: 'block' }}>{timestamp}</small>}
+                                                    {!isCurrent && timestamp && <small style={{ color: '#aaa', display: 'block' }}>{timestamp}</small>}
+                                                </div>
                                             </div>
-                                            <div>
-                                                <div className={`fw-bold ${isCurrent ? 'text-success' : ''}`}>{status}</div>
-                                                {description && <small className="text-muted">{description}</small>}
-                                                {timestamp && <small className="text-muted d-block">{timestamp}</small>}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
-
                     </div>
+
+                    {/* Right Column: Delivery + Price Details */}
                     <div className="col-lg-4">
                         <div className="delivery-card p-4 mb-4">
-                            <h6 className="mb-3">Delivery details</h6>
-                            <div className="mb-3" id="hd">
-                                <div className="d-flex align-items-center mb-2">
-                                    <i className="las la-building me-2"></i>
-                                    <small className="text-muted">Work</small>
-                                </div>
-                                <div className="ps-3">
-                                    <small>
-                                        {getNestedValue(order, 'shippingAddress.street', '17 10, GT Nagar, Nandanam saidapet, Chennai')}
+                            <h6 style={{ fontWeight: 700, marginBottom: 16 }}>Delivery details</h6>
+                            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 12 }}>
+                                <i className="las la-map-marker-alt" style={{ fontSize: 18, color: '#666', marginTop: 2 }}></i>
+                                <div>
+                                    <small style={{ color: '#888', display: 'block', marginBottom: 2 }}>Shipping Address</small>
+                                    <small style={{ color: '#212529', lineHeight: 1.5 }}>
+                                        {getNestedValue(order, 'shippingAddress.street', '')}{
+                                            getNestedValue(order, 'shippingAddress.city', '') && `, ${getNestedValue(order, 'shippingAddress.city', '')}`}{
+                                            getNestedValue(order, 'shippingAddress.state', '') && `, ${getNestedValue(order, 'shippingAddress.state', '')}`}{
+                                            getNestedValue(order, 'shippingAddress.postcode', '') && ` - ${getNestedValue(order, 'shippingAddress.postcode', '')}`}
                                     </small>
                                 </div>
                             </div>
-                            <div className="mb-4" id="hd">
-                                <div className="d-flex align-items-center mb-2">
-                                    <i className="las la-user me-2"></i>
-                                    <small className="text-muted">
-                                        {getNestedValue(order, 'shippingAddress.firstName', 'Pradeep')}{' '}
-                                        {getNestedValue(order, 'shippingAddress.lastName', 'Kumar')}
+                            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 8 }}>
+                                <i className="las la-user" style={{ fontSize: 18, color: '#666', marginTop: 2 }}></i>
+                                <div>
+                                    <small style={{ color: '#212529', fontWeight: 500 }}>
+                                        {getNestedValue(order, 'shippingAddress.firstName', '')}{' '}
+                                        {getNestedValue(order, 'shippingAddress.lastName', '')}
                                     </small>
+                                    <br />
+                                    <small style={{ color: '#888' }}>{getNestedValue(order, 'shippingAddress.phone', '')}</small>
                                 </div>
-                                <div className="ps-3">
-                                    <small>{getNestedValue(order, 'shippingAddress.phone', '9123200396')}</small>
+                            </div>
+                            <hr style={{ margin: '16px 0' }} />
+                            <h6 style={{ fontWeight: 700, marginBottom: 14 }}>Price Details</h6>
+                            {fmt(order.listPrice) && (
+                                <div className="price-row">
+                                    <span className="price-label">List price</span>
+                                    <span className="price-value">₹{fmt(order.listPrice)}</span>
                                 </div>
+                            )}
+                            {fmt(order.sellingPrice) && (
+                                <div className="price-row">
+                                    <span className="price-label">Selling price</span>
+                                    <span className="price-value">₹{fmt(order.sellingPrice)}</span>
+                                </div>
+                            )}
+                            {fmt(order.extraDiscount) && (
+                                <div className="price-row">
+                                    <span className="price-label">Extra Discount</span>
+                                    <span className="price-value" style={{ color: '#388e3c' }}>- ₹{fmt(order.extraDiscount)}</span>
+                                </div>
+                            )}
+                            {fmt(order.paymentHandlingFee) && (
+                                <div className="price-row">
+                                    <span className="price-label">Payment Handling Fee</span>
+                                    <span className="price-value">₹{fmt(order.paymentHandlingFee)}</span>
+                                </div>
+                            )}
+                            {fmt(order.protectPromiseFee) && (
+                                <div className="price-row">
+                                    <span className="price-label">Protect Promise Fee</span>
+                                    <span className="price-value">₹{fmt(order.protectPromiseFee)}</span>
+                                </div>
+                            )}
+                            <div className="price-row total-amount" style={{ borderTop: '1px solid #e0e0e0', paddingTop: 12, marginTop: 8 }}>
+                                <span style={{ fontWeight: 700 }}>Total Amount</span>
+                                <span style={{ fontWeight: 700, fontSize: 16 }}>₹{fmt(order.totalAmount)}</span>
                             </div>
-                            <h6 className="mb-3">Price Details</h6>
-                            <div className="price-row">
-                                <span className="price-label">List price</span>
-                                <span className="price-value">₹{order.listPrice || '2,990'}</span>
-                            </div>
-                            <div className="price-row">
-                                <span className="price-label">Selling price</span>
-                                <span className="price-value">₹{order.sellingPrice || '999'}</span>
-                            </div>
-                            <div className="price-row">
-                                <span className="price-label">Extra Discount</span>
-                                <span className="price-value text-success">- ₹{order.extraDiscount || '252'}</span>
-                            </div>
-                            <div className="price-row">
-                                <span className="price-label">
-                                    Special Price <i className="las la-question-circle"></i>
-                                </span>
-                                <span className="price-value">₹{order.specialPrice || '747'}</span>
-                            </div>
-                            <div className="price-row">
-                                <span className="price-label">Payment Handling Fee</span>
-                                <span className="price-value">₹{order.paymentHandlingFee || '10'}</span>
-                            </div>
-                            <div className="price-row">
-                                <span className="price-label">Protect Promise Fee</span>
-                                <span className="price-value">₹{order.protectPromiseFee || '9'}</span>
-                            </div>
-                            <div className="price-row total-amount">
-                                <span>Total Amount</span>
-                                <span>₹{order.totalAmount || '766'}</span>
-                            </div>
-                            <div className="mt-3">
-                                <small className="text-success">
-                                    <i className="las la-dot-circle"></i> {order.paymentMethod || 'Cash On Delivery'}: ₹
-                                    {order.totalAmount || '766.0'}
+                            <div style={{ marginTop: 12, padding: '8px 12px', background: '#f0fff4', borderRadius: 6 }}>
+                                <small style={{ color: '#2e7d32', fontWeight: 500 }}>
+                                    ✔ {order.paymentMethod || 'COD'}: ₹{fmt(order.totalAmount)}
                                 </small>
                             </div>
-                            {/* Invoice Download Button - Show only if order is delivered */}
                             {isDelivered && (
                                 <div className="mt-4 pt-3 border-top">
                                     <button
@@ -448,36 +527,36 @@ function OrderDetails() {
                             )}
                         </div>
                         {/* Action Buttons */}
-                        <div className="d-flex gap-2 mb-3">
-                            {/* Cancel Order Button: Show only if not Delivered, not Cancelled, and not Return Requested */}
+                        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
                             {currentStatus !== 'Delivered' &&
                                 currentStatus !== 'Cancelled' &&
                                 currentStatus !== 'Return Requested' &&
                                 isWithinCancellationPeriod() && (
                                     <button
                                         className="btn btn-light flex-fill d-flex align-items-center justify-content-center"
+                                        style={{ border: '1px solid #e0e0e0', borderRadius: 8, fontWeight: 500, fontSize: 13 }}
                                         onClick={() => setShowCancelDialog(true)}
                                     >
-                                        <i className="las la-times-circle me-2"></i>
+                                        <i className="las la-times-circle me-2" style={{ color: '#e53935' }}></i>
                                         Cancel Order
                                     </button>
                                 )}
-                            {/* Return Order Button: Show only if Delivered and within return period */}
                             {currentStatus === 'Delivered' && isWithinReturnPeriod() && (
                                 <button
                                     className="btn btn-light flex-fill d-flex align-items-center justify-content-center"
+                                    style={{ border: '1px solid #e0e0e0', borderRadius: 8, fontWeight: 500, fontSize: 13 }}
                                     onClick={() => setShowReturnDialog(true)}
                                 >
-                                    <i className="las la-sync me-2"></i>
-                                    Return Order
+                                    <i className="las la-sync me-2" style={{ color: '#f57c00' }}></i>
+                                    Return / Exchange
                                 </button>
                             )}
-                            {/* Chat Button: Always visible */}
                             <button
                                 className="btn btn-light flex-fill d-flex align-items-center justify-content-center"
+                                style={{ border: '1px solid #e0e0e0', borderRadius: 8, fontWeight: 500, fontSize: 13 }}
                                 onClick={() => setShowChatDialog(true)}
                             >
-                                <i className="las la-comments me-2"></i>
+                                <i className="las la-comments me-2" style={{ color: '#2874f0' }}></i>
                                 Chat with Us
                             </button>
                         </div>
@@ -668,191 +747,199 @@ function OrderDetails() {
                         </div>
                     </div>
                 </div>
-            )}
+            )
+            }
 
             {/* Cancel Order Dialog */}
-            {showCancelDialog && (
-                <div className="modal-overlay">
-                    <div className="modal-dialog">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Cancel Order</h5>
-                                <button type="button" className="btn-close" onClick={() => setShowCancelDialog(false)}></button>
-                            </div>
-                            <div className="modal-body">
-                                <div className="mb-3">
-                                    <label className="form-label">Reason for Cancellation *</label>
-                                    <select
-                                        className="form-select"
-                                        value={cancelReason}
-                                        onChange={(e) => setCancelReason(e.target.value)}
-                                    >
-                                        <option value="">Select a reason</option>
-                                        {cancelReasons.map((reason, index) => (
-                                            <option key={index} value={reason}>
-                                                {reason}
-                                            </option>
-                                        ))}
-                                    </select>
+            {
+                showCancelDialog && (
+                    <div className="modal-overlay">
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">Cancel Order</h5>
+                                    <button type="button" className="btn-close" onClick={() => setShowCancelDialog(false)}></button>
                                 </div>
-                                {cancelReason === 'Other' && (
+                                <div className="modal-body">
                                     <div className="mb-3">
-                                        <label className="form-label">Please specify</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            value={otherReason}
-                                            onChange={(e) => setOtherReason(e.target.value)}
-                                            placeholder="Enter your reason"
-                                        />
-                                    </div>
-                                )}
-                                <div className="mb-3">
-                                    <label className="form-label">Additional Comments (Optional)</label>
-                                    <textarea
-                                        className="form-control"
-                                        rows="3"
-                                        value={additionalComments}
-                                        onChange={(e) => setAdditionalComments(e.target.value)}
-                                        placeholder="Any additional comments..."
-                                    />
-                                </div>
-                            </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" onClick={() => setShowCancelDialog(false)}>
-                                    Close
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-danger"
-                                    onClick={handleCancelOrder}
-                                    disabled={isSubmitting}
-                                >
-                                    {isSubmitting ? 'Cancelling...' : 'Confirm Cancellation'}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Return Order Dialog */}
-            {showReturnDialog && (
-                <div className="modal-overlay">
-                    <div className="modal-dialog modal-lg">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Return Order</h5>
-                                <button type="button" className="btn-close" onClick={() => setShowReturnDialog(false)}></button>
-                            </div>
-                            <div className="modal-body">
-                                <div className="mb-3">
-                                    <label className="form-label">Reason for Return *</label>
-                                    <select
-                                        className="form-select"
-                                        value={returnReason}
-                                        onChange={(e) => setReturnReason(e.target.value)}
-                                    >
-                                        <option value="">Select a reason</option>
-                                        {returnReasons.map((reason, index) => (
-                                            <option key={index} value={reason}>
-                                                {reason}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label">Describe the Issue *</label>
-                                    <textarea
-                                        className="form-control"
-                                        rows="4"
-                                        value={issueDescription}
-                                        onChange={(e) => setIssueDescription(e.target.value)}
-                                        placeholder="Please describe the issue in detail..."
-                                        required
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label">Upload Images or Videos *</label>
-                                    <input
-                                        type="file"
-                                        className="form-control"
-                                        multiple
-                                        accept="image/*,video/*"
-                                        onChange={handleImageUpload}
-                                    />
-                                    <div className="form-text">Upload clear images or videos showing the issue</div>
-                                    {returnImages.length > 0 && (
-                                        <div className="mt-2">
-                                            <h6>Uploaded Files:</h6>
-                                            {returnImages.map((file, index) => (
-                                                <div key={index} className="d-flex align-items-center justify-content-between mb-1">
-                                                    <span>{file.name}</span>
-                                                    <button
-                                                        type="button"
-                                                        className="btn btn-sm btn-outline-danger"
-                                                        onClick={() => removeImage(index)}
-                                                    >
-                                                        Remove
-                                                    </button>
-                                                </div>
+                                        <label className="form-label">Reason for Cancellation *</label>
+                                        <select
+                                            className="form-select"
+                                            value={cancelReason}
+                                            onChange={(e) => setCancelReason(e.target.value)}
+                                        >
+                                            <option value="">Select a reason</option>
+                                            {cancelReasons.map((reason, index) => (
+                                                <option key={index} value={reason}>
+                                                    {reason}
+                                                </option>
                                             ))}
+                                        </select>
+                                    </div>
+                                    {cancelReason === 'Other' && (
+                                        <div className="mb-3">
+                                            <label className="form-label">Please specify</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                value={otherReason}
+                                                onChange={(e) => setOtherReason(e.target.value)}
+                                                placeholder="Enter your reason"
+                                            />
                                         </div>
                                     )}
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label">Refund / Replacement Choice *</label>
-                                    <div>
-                                        <div className="form-check">
-                                            <input
-                                                className="form-check-input"
-                                                type="radio"
-                                                name="refundChoice"
-                                                value="refund"
-                                                checked={refundChoice === 'refund'}
-                                                onChange={(e) => setRefundChoice(e.target.value)}
-                                            />
-                                            <label className="form-check-label">Refund</label>
-                                        </div>
-                                        <div className="form-check">
-                                            <input
-                                                className="form-check-input"
-                                                type="radio"
-                                                name="refundChoice"
-                                                value="replacement"
-                                                checked={refundChoice === 'replacement'}
-                                                onChange={(e) => setRefundChoice(e.target.value)}
-                                            />
-                                            <label className="form-check-label">Replacement</label>
-                                        </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Additional Comments (Optional)</label>
+                                        <textarea
+                                            className="form-control"
+                                            rows="3"
+                                            value={additionalComments}
+                                            onChange={(e) => setAdditionalComments(e.target.value)}
+                                            placeholder="Any additional comments..."
+                                        />
                                     </div>
                                 </div>
-                            </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" onClick={() => setShowReturnDialog(false)}>
-                                    Close
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-warning"
-                                    onClick={handleReturnOrder}
-                                    disabled={isSubmitting || !returnReason || !issueDescription || returnImages.length === 0}
-                                >
-                                    {isSubmitting ? 'Submitting...' : 'Submit Return Request'}
-                                </button>
+                                <div className="modal-footer">
+                                    <button type="button" className="btn btn-secondary" onClick={() => setShowCancelDialog(false)}>
+                                        Close
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-danger"
+                                        onClick={handleCancelOrder}
+                                        disabled={isSubmitting}
+                                    >
+                                        {isSubmitting ? 'Cancelling...' : 'Confirm Cancellation'}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
+
+            {/* Return Order Dialog */}
+            {
+                showReturnDialog && (
+                    <div className="modal-overlay">
+                        <div className="modal-dialog modal-lg">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">Return Order</h5>
+                                    <button type="button" className="btn-close" onClick={() => setShowReturnDialog(false)}></button>
+                                </div>
+                                <div className="modal-body">
+                                    <div className="mb-3">
+                                        <label className="form-label">Reason for Return *</label>
+                                        <select
+                                            className="form-select"
+                                            value={returnReason}
+                                            onChange={(e) => setReturnReason(e.target.value)}
+                                        >
+                                            <option value="">Select a reason</option>
+                                            {returnReasons.map((reason, index) => (
+                                                <option key={index} value={reason}>
+                                                    {reason}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Describe the Issue *</label>
+                                        <textarea
+                                            className="form-control"
+                                            rows="4"
+                                            value={issueDescription}
+                                            onChange={(e) => setIssueDescription(e.target.value)}
+                                            placeholder="Please describe the issue in detail..."
+                                            required
+                                        />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Upload Images or Videos *</label>
+                                        <input
+                                            type="file"
+                                            className="form-control"
+                                            multiple
+                                            accept="image/*,video/*"
+                                            onChange={handleImageUpload}
+                                        />
+                                        <div className="form-text">Upload clear images or videos showing the issue</div>
+                                        {returnImages.length > 0 && (
+                                            <div className="mt-2">
+                                                <h6>Uploaded Files:</h6>
+                                                {returnImages.map((file, index) => (
+                                                    <div key={index} className="d-flex align-items-center justify-content-between mb-1">
+                                                        <span>{file.name}</span>
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-sm btn-outline-danger"
+                                                            onClick={() => removeImage(index)}
+                                                        >
+                                                            Remove
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Refund / Replacement Choice *</label>
+                                        <div>
+                                            <div className="form-check">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    name="refundChoice"
+                                                    value="refund"
+                                                    checked={refundChoice === 'refund'}
+                                                    onChange={(e) => setRefundChoice(e.target.value)}
+                                                />
+                                                <label className="form-check-label">Refund</label>
+                                            </div>
+                                            <div className="form-check">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    name="refundChoice"
+                                                    value="replacement"
+                                                    checked={refundChoice === 'replacement'}
+                                                    onChange={(e) => setRefundChoice(e.target.value)}
+                                                />
+                                                <label className="form-check-label">Replacement</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="modal-footer">
+                                    <button type="button" className="btn btn-secondary" onClick={() => setShowReturnDialog(false)}>
+                                        Close
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-warning"
+                                        onClick={handleReturnOrder}
+                                        disabled={isSubmitting || !returnReason || !issueDescription || returnImages.length === 0}
+                                    >
+                                        {isSubmitting ? 'Submitting...' : 'Submit Return Request'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
 
             {/* Chat Dialog */}
-            {showChatDialog && (
-                <ChatModal orderId={orderId} userId={currentUserId} userRole={currentUserRole} onClose={() => setShowChatDialog(false)} />
-            )}
+            {
+                showChatDialog && (
+                    <ChatModal orderId={orderId} userId={currentUserId} userRole={currentUserRole} onClose={() => setShowChatDialog(false)} />
+                )
+            }
 
             <Footer />
         </div>
+
     );
 }
 

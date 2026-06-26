@@ -40,6 +40,7 @@ const OrderDetails = ({ order, onBack }) => {
   const [timelineData, setTimelineData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedFullImage, setSelectedFullImage] = useState(null);
 
   // Deduplicate timeline data
   const deduplicateTimelineData = (data) => {
@@ -169,8 +170,8 @@ const OrderDetails = ({ order, onBack }) => {
   const cancelOrderInDB = async (reason) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`https://cctvshoppee.onrender.com/api/orders/${order._id}/cancel`, {
-        method: "PUT",
+      const response = await fetch(`http://localhost:5000/api/orders/${order._id}/cancel`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -199,8 +200,8 @@ const OrderDetails = ({ order, onBack }) => {
         user: "System",
       };
       const updatedTimeline = deduplicateTimelineData([...timelineData, newTimelineEntry]);
-      await fetch(`https://cctvshoppee.onrender.com/api/orders/${order._id}/timeline`, {
-        method: "PUT",
+      await fetch(`http://localhost:5000/api/orders/${order._id}/timeline`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -225,8 +226,8 @@ const OrderDetails = ({ order, onBack }) => {
         user: "Admin User",
       };
       const updatedTimeline = deduplicateTimelineData([...timelineData, newTimelineEntry]);
-      await fetch(`https://cctvshoppee.onrender.com/api/orders/${order._id}/timeline`, {
-        method: "PUT",
+      await fetch(`http://localhost:5000/api/orders/${order._id}/timeline`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -251,8 +252,8 @@ const OrderDetails = ({ order, onBack }) => {
         user: "Admin User",
       };
       const updatedTimeline = deduplicateTimelineData([...timelineData, newTimelineEntry]);
-      await fetch(`https://cctvshoppee.onrender.com/api/orders/${order._id}/timeline`, {
-        method: "PUT",
+      await fetch(`http://localhost:5000/api/orders/${order._id}/timeline`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -410,6 +411,7 @@ const OrderDetails = ({ order, onBack }) => {
             <img
               src={`https://cctvshoppee.onrender.com/uploads/${item.productId?.image}`}
               alt={item.productId?.name || "Product"}
+              onClick={() => setSelectedFullImage(`http://localhost:5000/uploads/${item.productId?.image}`)}
               style={{
                 marginRight: "16px",
                 border: "1px solid #e6e6e6",
@@ -417,6 +419,7 @@ const OrderDetails = ({ order, onBack }) => {
                 width: "100px",
                 height: "100px",
                 objectFit: "cover",
+                cursor: "pointer",
               }}
             />
             <div style={{ flex: 1 }}>
@@ -561,12 +564,14 @@ const OrderDetails = ({ order, onBack }) => {
                     <img
                       src={`https://cctvshoppee.onrender.com/uploads/${order.items[0]?.productId?.image}`}
                       alt={order.items[0]?.productId?.name || "Product"}
+                      onClick={() => setSelectedFullImage(`http://localhost:5000/uploads/${order.items[0]?.productId?.image}`)}
                       style={{
                         width: "40px",
                         height: "40px",
                         objectFit: "cover",
                         borderRadius: "4px",
                         marginRight: "8px",
+                        cursor: "pointer",
                       }}
                     />
                     <span style={{ fontSize: "14px", color: "#374151" }}>
@@ -609,12 +614,14 @@ const OrderDetails = ({ order, onBack }) => {
           <img
             src={`https://cctvshoppee.onrender.com/uploads/${order.items[0]?.productId?.image}`}
             alt={order.items[0]?.productId?.name || "Product"}
+            onClick={() => setSelectedFullImage(`http://localhost:5000/uploads/${order.items[0]?.productId?.image}`)}
             style={{
               width: "60px",
               height: "60px",
               objectFit: "cover",
               borderRadius: "4px",
               marginRight: "12px",
+              cursor: "pointer",
             }}
           />
           <div>
@@ -753,12 +760,14 @@ const OrderDetails = ({ order, onBack }) => {
           <img
             src={`https://cctvshoppee.onrender.com/uploads/${order.items[0]?.productId?.image}`}
             alt={order.items[0]?.productId?.name || "Product"}
+            onClick={() => setSelectedFullImage(`http://localhost:5000/uploads/${order.items[0]?.productId?.image}`)}
             style={{
               width: "40px",
               height: "40px",
               objectFit: "cover",
               borderRadius: "4px",
               marginRight: "12px",
+              cursor: "pointer",
             }}
           />
           <div>
@@ -887,12 +896,12 @@ const OrderDetails = ({ order, onBack }) => {
   const renderCancelRequestTab = () => (
     <div style={{ padding: "20px", border: "1px solid #e1e2e2", borderRadius: "7px", backgroundColor: "#f9fafb" }}>
       <h3>Cancel Request</h3>
-      {order.cancelRequest ? (
+      {order.cancellation ? (
         <>
-          <p><strong>Reason:</strong> {order.cancelRequest.reason}</p>
-          {order.cancelRequest.otherReason && <p><strong>Other Reason:</strong> {order.cancelRequest.otherReason}</p>}
-          {order.cancelRequest.additionalComments && <p><strong>Additional Comments:</strong> {order.cancelRequest.additionalComments}</p>}
-          <p><strong>Requested At:</strong> {new Date(order.cancelRequest.cancelledAt).toLocaleString()}</p>
+          <p><strong>Reason:</strong> {order.cancellation.reason}</p>
+          {order.cancellation.otherReason && <p><strong>Other Reason:</strong> {order.cancellation.otherReason}</p>}
+          {order.cancellation.additionalComments && <p><strong>Additional Comments:</strong> {order.cancellation.additionalComments}</p>}
+          <p><strong>Requested At:</strong> {new Date(order.cancellation.cancelledAt).toLocaleString()}</p>
         </>
       ) : (
         <p>No cancellation request found.</p>
@@ -914,14 +923,21 @@ const OrderDetails = ({ order, onBack }) => {
             <div>
               <h4>Uploaded Images:</h4>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: "10px" }}>
-                {order.returnRequest.images.map((image, index) => (
-                  <img
-                    key={index}
-                    src={`http://localhost:5000/uploads/${image}`}
-                    alt={`Return Issue ${index + 1}`}
-                    style={{ width: "100px", height: "100px", margin: "5px" }}
-                  />
-                ))}
+                {order.returnRequest.images.map((image, index) => {
+                  let imgSrc = image;
+                  if (!imgSrc.startsWith('http')) {
+                    imgSrc = `http://localhost:5000${imgSrc.startsWith('/uploads') ? '' : '/uploads/'}${imgSrc}`;
+                  }
+                  return (
+                    <img
+                      key={index}
+                      src={imgSrc}
+                      onClick={() => setSelectedFullImage(imgSrc)}
+                      alt={`Return Issue ${index + 1}`}
+                      style={{ width: "100px", height: "100px", margin: "5px", objectFit: "cover", borderRadius: "4px", cursor: "pointer" }}
+                    />
+                  );
+                })}
               </div>
             </div>
           )}
@@ -1224,6 +1240,24 @@ const OrderDetails = ({ order, onBack }) => {
           <Button onClick={() => setShowCancelDialog(false)}>Keep Order</Button>
         </DialogActions>
       </Dialog>
+
+      <Dialog
+        open={!!selectedFullImage}
+        onClose={() => setSelectedFullImage(null)}
+        maxWidth="lg"
+      >
+        <DialogTitle style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          Full Image View
+          <Button onClick={() => setSelectedFullImage(null)} color="error">Close</Button>
+        </DialogTitle>
+        <DialogContent>
+          <img
+            src={selectedFullImage}
+            alt="Full size"
+            style={{ width: "100%", height: "auto", maxHeight: "80vh", objectFit: "contain" }}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
@@ -1251,7 +1285,7 @@ OrderDetails.propTypes = {
     specialPrice: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     paymentHandlingFee: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     protectPromiseFee: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    cancelRequest: PropTypes.shape({
+    cancellation: PropTypes.shape({
       reason: PropTypes.string,
       otherReason: PropTypes.string,
       additionalComments: PropTypes.string,

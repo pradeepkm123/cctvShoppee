@@ -66,6 +66,7 @@ const express = require("express");
 const router = express.Router();
 const { authenticate } = require("../middleware/authMiddleware");
 const upload = require("../middleware/upload");
+const returnUpload = require("../middleware/uploadMiddleware");
 const {
   createOrder,
   getUserOrders,
@@ -82,6 +83,7 @@ const {
   checkCancellationEligibility,
   downloadInvoice,
   getPublicOrders, // ✅ new controller
+  deleteOrder, // ✅ Added for swipe to delete
 } = require("../controllers/orderController");
 
 // ✅ PUBLIC ROUTE (no authentication required)
@@ -118,10 +120,13 @@ router.put("/:orderId/refund", processRefund);
 router.post("/:orderId/cancel", cancelOrder);
 
 // ✅ Return actions
-router.post("/:orderId/return", upload.array("images", 5), requestReturnOrder);
+router.post("/:orderId/return", returnUpload.array("images", 5), requestReturnOrder);
 router.put("/:orderId/return/status", updateReturnStatus);
 
 // ✅ Download invoice
 router.get("/:orderId/invoice", downloadInvoice);
+
+// ✅ Delete order
+router.delete("/:orderId", deleteOrder);
 
 module.exports = router;
