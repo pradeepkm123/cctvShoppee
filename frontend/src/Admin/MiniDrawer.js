@@ -511,7 +511,6 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import StoreIcon from '@mui/icons-material/Store';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import ChatIcon from '@mui/icons-material/Chat';
-import { FaCube } from 'react-icons/fa';
 import BusinessIcon from '@mui/icons-material/Business';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -700,7 +699,7 @@ const MiniDrawer = () => {
 
           {/* Inventory Tree Structure */}
           <ListItemButton onClick={handleInventoryClick}>
-            <ListItemIcon><FaCube /></ListItemIcon>
+            <ListItemIcon><Inventory2Icon /></ListItemIcon>
             <ListItemText primary="Inventory" />
             {inventoryOpen ? <ExpandLess /> : <ExpandMore />}
           </ListItemButton>
