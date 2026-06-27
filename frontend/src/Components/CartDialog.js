@@ -29,7 +29,7 @@ const CartDialog = ({ cart, isCartOpen, toggleCart, handleRemoveItem, handleIncr
                     <div className="cartmini__widget-item" key={item.product._id}>
                       <div className="cartmini__thumb">
                         <Link to={`/product/${item.product._id}`}>
-                          <img src={`https://cctvshoppee.onrender.com/uploads/${item.product.image}`} alt={item.product.name} />
+                          <img src={`http://52.66.98.128:5001/uploads/${item.product.image}`} alt={item.product.name} />
                         </Link>
                       </div>
                       <div className="cartmini__content">

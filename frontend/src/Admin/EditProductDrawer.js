@@ -14,8 +14,8 @@ import {
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:5000/api';
-const FILE_HOST = 'http://localhost:5000';
+const API_BASE = 'http://52.66.98.128:5001/api';
+const FILE_HOST = 'http://52.66.98.128:5001';
 
 const toAbsUrl = (u) => {
   if (!u) return '';

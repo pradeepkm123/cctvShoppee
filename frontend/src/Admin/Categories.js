@@ -15,7 +15,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 
-const API_BASE = 'https://cctvshoppee.onrender.com';
+const API_BASE = 'http://52.66.98.128:5001';
 
 function Categories() {
   const [categories, setCategories] = useState([]);

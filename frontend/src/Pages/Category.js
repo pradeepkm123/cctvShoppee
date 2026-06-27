@@ -15,7 +15,7 @@ function Category() {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('https://cctvshoppee.onrender.com/api/categories');
+      const response = await axios.get('http://52.66.98.128:5001/api/categories');
       setCategories(response.data);
       setLoading(false);
     } catch (error) {
@@ -94,7 +94,7 @@ function Category() {
                       <div
                         className="tp-category-main-thumb include-bg transition-3"
                         style={{
-                          backgroundImage: `url(https://cctvshoppee.onrender.com${category.image})`,
+                          backgroundImage: `url(http://52.66.98.128:5001${category.image})`,
                           backgroundSize: 'contain',
                           backgroundPosition: 'center',
                           height: '200px',

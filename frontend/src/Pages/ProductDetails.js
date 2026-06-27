@@ -8,9 +8,9 @@ import Footer from '../Components/Footer';
 import RelatedProduct from '../Components/RelatedProduct';
 import '../Pages/ProductDetails.css';
 
-const API_BASE = 'https://cctvshoppee.onrender.com/api';
-const FILE_HOST = 'https://cctvshoppee.onrender.com';
-const specUrl = 'https://cctvshoppee.onrender.com/api';
+const API_BASE = 'http://52.66.98.128:5001/api';
+const FILE_HOST = 'http://52.66.98.128:5001';
+const specUrl = 'http://52.66.98.128:5001/api';
 const VISIBLE_THUMBS = 5;
 
 // ---- Helpers ----
@@ -637,7 +637,7 @@ export default function ProductDetails() {
                               {specUrl ? (
                                 <div className="brochure-embed">
                                   <iframe
-                                    src="https://cctvshoppee.onrender.com/uploads/1748678409488.pdf#toolbar=1"
+                                    src="http://52.66.98.128:5001/uploads/1748678409488.pdf#toolbar=1"
                                     width="100%"
                                     height="100%"
                                     style={{ border: 'none' }}

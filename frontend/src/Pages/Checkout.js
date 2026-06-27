@@ -48,7 +48,7 @@ function Checkout() {
     const fetchBalance = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('https://cctvshoppee.onrender.com/api/supercoins/balance', {
+        const response = await fetch('http://52.66.98.128:5001/api/supercoins/balance', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -133,7 +133,7 @@ function Checkout() {
   const verifyUpiId = async (upiId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://cctvshoppee.onrender.com/api/checkout/verify-upi', {
+      const response = await fetch('http://52.66.98.128:5001/api/checkout/verify-upi', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -174,7 +174,7 @@ function Checkout() {
       let superCoinsUsed = 0;
       if (useSuperCoins) {
         superCoinsUsed = Math.min(50, balance);
-        const useSuperCoinsRes = await fetch('https://cctvshoppee.onrender.com/api/supercoins/use', {
+        const useSuperCoinsRes = await fetch('http://52.66.98.128:5001/api/supercoins/use', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -193,7 +193,7 @@ function Checkout() {
       }
 
       // Step 2: Create Payment Link
-      const paymentRes = await fetch('https://cctvshoppee.onrender.com/api/payments/payment-link', {
+      const paymentRes = await fetch('http://52.66.98.128:5001/api/payments/payment-link', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -219,7 +219,7 @@ function Checkout() {
         name: item.product?.name || item.name,
       }));
 
-      const orderRes = await fetch('https://cctvshoppee.onrender.com/api/orders', {
+      const orderRes = await fetch('http://52.66.98.128:5001/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -250,7 +250,7 @@ function Checkout() {
 
         // Step 4: Earn SuperCoins
         try {
-          await fetch('https://cctvshoppee.onrender.com/api/supercoins/earn', {
+          await fetch('http://52.66.98.128:5001/api/supercoins/earn', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -268,7 +268,7 @@ function Checkout() {
 
         // Step 5: Clear Cart
         try {
-          await fetch('https://cctvshoppee.onrender.com/api/cart/clear', {
+          await fetch('http://52.66.98.128:5001/api/cart/clear', {
             method: 'DELETE',
             headers: {
               Authorization: `Bearer ${token}`,

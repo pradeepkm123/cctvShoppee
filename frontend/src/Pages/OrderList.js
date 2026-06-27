@@ -19,7 +19,7 @@ function OrderList() {
       }
       try {
         console.log('Using token:', token);
-        const response = await axios.get('https://cctvshoppee.onrender.com/api/orders', {
+        const response = await axios.get('http://52.66.98.128:5001/api/orders', {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -88,7 +88,7 @@ function OrderList() {
                               <td>{order._id}</td>
                               <td>
                                 <img
-                                  src={`https://cctvshoppee.onrender.com/uploads/${item.productId?.image}`}
+                                  src={`http://52.66.98.128:5001/uploads/${item.productId?.image}`}
                                   alt={item.productId?.name}
                                   style={{ width: '50px', height: 'auto' }}
                                 />

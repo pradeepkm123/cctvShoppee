@@ -17,7 +17,7 @@ function Category() {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('https://cctvshoppee.onrender.com/api/categories');
+      const response = await axios.get('http://52.66.98.128:5001/api/categories');
       setCategories(response.data);
       setLoading(false);
     } catch (error) {
@@ -60,7 +60,7 @@ function Category() {
                     <div className="tp-product-category-thumb fix">
                       <Link to={toCategoryPath(category)}>
                         <img
-                          src={`https://cctvshoppee.onrender.com${category.image}`}
+                          src={`http://52.66.98.128:5001${category.image}`}
                           alt={category.name}
                           width={130}
                         />

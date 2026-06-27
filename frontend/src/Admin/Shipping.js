@@ -27,7 +27,7 @@ const ShippingDelivery = () => {
         setLoading(true);
         
         // Fetch orders using public endpoint
-        const ordersResponse = await fetch('https://cctvshoppee.onrender.com/api/orders/public');
+        const ordersResponse = await fetch('http://52.66.98.128:5001/api/orders/public');
         if (!ordersResponse.ok) {
           throw new Error(`Orders API error: ${ordersResponse.status}`);
         }

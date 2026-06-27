@@ -1,7 +1,7 @@
 // src/services/api.js
 import axios from 'axios';
 
-const API_URL = 'https://cctvshoppee.onrender.com/api/products';
+const API_URL = 'http://52.66.98.128:5001/api/products';
 
 export const getProducts = (params) => axios.get(API_URL, { params });
 export const getProduct = (id) => axios.get(`${API_URL}/${id}`);

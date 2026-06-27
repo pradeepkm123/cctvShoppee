@@ -18,7 +18,7 @@ function SuperCoins() {
     const fetchBalance = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('https://cctvshoppee.onrender.com/api/supercoins/balance', {
+        const response = await axios.get('http://52.66.98.128:5001/api/supercoins/balance', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

@@ -22,7 +22,7 @@ function FilterProduct() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('https://cctvshoppee.onrender.com/api/categories');
+        const response = await axios.get('http://52.66.98.128:5001/api/categories');
         setCategories(response.data);
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -35,7 +35,7 @@ function FilterProduct() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        let url = 'https://cctvshoppee.onrender.com/api/products';
+        let url = 'http://52.66.98.128:5001/api/products';
         if (selectedCategory) {
           url += `?category=${encodeURIComponent(selectedCategory)}`;
         }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import './PopupAd.css';
 
-const API_BASE = (process.env.REACT_APP_API_BASE || 'http://localhost:5000').replace(/\/api$/, '');
+const API_BASE = (process.env.REACT_APP_API_BASE || 'http://52.66.98.128:5001').replace(/\/api$/, '');
 
 const PopupAd = () => {
     const location = useLocation();

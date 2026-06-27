@@ -6,7 +6,7 @@ const PaymentHandler = ({ order }) => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/api/orders/${order._id}/pay`,
+        `http://52.66.98.128:5001/api/orders/${order._id}/pay`,
         { transactionId: paymentId, amount: order.totalAmount },
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -148,7 +148,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
 import './HomeBanner.css';
 
-const API_BASE = process.env.REACT_APP_API_BASE || 'https://cctvshoppee.onrender.com';
+const API_BASE = process.env.REACT_APP_API_BASE || 'http://52.66.98.128:5001';
 
 export default function HomeBanner({ storeId = 'default' }) {
     const [slides, setSlides] = useState([]);
