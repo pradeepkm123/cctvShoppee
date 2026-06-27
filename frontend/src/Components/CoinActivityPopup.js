@@ -14,7 +14,7 @@ const CoinActivityPopup = ({ show, onClose }) => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const balanceResponse = await axios.get('http://52.66.98.128:5001/api/supercoins/balance', {
+        const balanceResponse = await axios.get('https://api.cctvshoppee.com/api/supercoins/balance', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

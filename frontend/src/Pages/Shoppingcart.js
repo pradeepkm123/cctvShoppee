@@ -4,7 +4,7 @@ import axios from 'axios';
 import Navbar from '../Components/Navbar';
 import Footer from '../Components/Footer';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://52.66.98.128:5001';
+const API_URL = process.env.REACT_APP_API_URL || 'https://api.cctvshoppee.com';
 
 function ShoppingCart() {
   const [cart, setCart] = useState([]);

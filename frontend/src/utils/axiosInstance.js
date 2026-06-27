@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://52.66.98.128:5001/api', // your backend API
+  baseURL: 'https://api.cctvshoppee.com/api', // your backend API
   headers: { 'Content-Type': 'application/json' },
 });
 

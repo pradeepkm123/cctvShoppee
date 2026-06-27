@@ -25,7 +25,7 @@ const WarehouseDetails = () => {
   // Fetch warehouses from the backend
   const fetchWarehouses = async () => {
     try {
-      const response = await axios.get('http://52.66.98.128:5001/api/warehouses');
+      const response = await axios.get('https://api.cctvshoppee.com/api/warehouses');
       setWarehouses(response.data);
     } catch (error) {
       console.error('Error fetching warehouses:', error);
@@ -79,10 +79,10 @@ const WarehouseDetails = () => {
     try {
       if (currentWarehouse) {
         // Update existing warehouse
-        await axios.put(`http://52.66.98.128:5001/api/warehouses/${currentWarehouse._id}`, formData);
+        await axios.put(`https://api.cctvshoppee.com/api/warehouses/${currentWarehouse._id}`, formData);
       } else {
         // Add new warehouse
-        await axios.post('http://52.66.98.128:5001/api/warehouses', formData);
+        await axios.post('https://api.cctvshoppee.com/api/warehouses', formData);
       }
       fetchWarehouses();
       setIsModalOpen(false);
@@ -93,7 +93,7 @@ const WarehouseDetails = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      await axios.delete(`http://52.66.98.128:5001/api/warehouses/${currentWarehouse._id}`);
+      await axios.delete(`https://api.cctvshoppee.com/api/warehouses/${currentWarehouse._id}`);
       fetchWarehouses();
       setIsDeleteModalOpen(false);
     } catch (error) {

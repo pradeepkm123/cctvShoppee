@@ -35,7 +35,7 @@ const ChatModal = ({ orderId, onClose }) => {
         }
         setUserId(storedId);
 
-        const newSocket = io('http://52.66.98.128:5001');
+        const newSocket = io('https://api.cctvshoppee.com');
         setSocket(newSocket);
 
         return () => {

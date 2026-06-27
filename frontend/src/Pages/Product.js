@@ -31,7 +31,7 @@ function Product() {
 
   const fetchProducts = async () => {
     try {
-      let url = 'http://52.66.98.128:5001/api/products';
+      let url = 'https://api.cctvshoppee.com/api/products';
       if (category) {
         url += `?category=${encodeURIComponent(category)}`;
       }

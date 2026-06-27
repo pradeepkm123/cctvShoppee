@@ -27,7 +27,7 @@ const LocationManagement = () => {
   // Fetch locations from backend
   const fetchLocations = async () => {
     try {
-      const response = await axios.get('http://52.66.98.128:5001/api/locations');
+      const response = await axios.get('https://api.cctvshoppee.com/api/locations');
       setLocations(response.data);
     } catch (error) {
       console.error('Error fetching locations:', error);
@@ -93,10 +93,10 @@ const LocationManagement = () => {
 
       if (editingLocation) {
         // Update existing location
-        await axios.put(`http://52.66.98.128:5001/api/locations/${editingLocation._id}`, locationData);
+        await axios.put(`https://api.cctvshoppee.com/api/locations/${editingLocation._id}`, locationData);
       } else {
         // Add new location
-        await axios.post('http://52.66.98.128:5001/api/locations', locationData);
+        await axios.post('https://api.cctvshoppee.com/api/locations', locationData);
       }
 
       // Refresh the locations list
@@ -116,7 +116,7 @@ const LocationManagement = () => {
   // Confirm Delete Location
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`http://52.66.98.128:5001/api/locations/${selectedLocation._id}`);
+      await axios.delete(`https://api.cctvshoppee.com/api/locations/${selectedLocation._id}`);
       // Refresh the locations list
       await fetchLocations();
       setShowDeleteModal(false);

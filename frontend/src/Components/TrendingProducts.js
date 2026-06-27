@@ -9,7 +9,7 @@ function TrendingProducts() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://52.66.98.128:5001/api/products');
+        const response = await axios.get('https://api.cctvshoppee.com/api/products');
         console.log('API Response:', response.data);
         if (Array.isArray(response.data)) {
           setProducts(response.data);

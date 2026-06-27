@@ -27,7 +27,7 @@ const StockInward = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://52.66.98.128:5001/api/products');
+      const response = await fetch('https://api.cctvshoppee.com/api/products');
       const data = await response.json();
       setProducts(data);
     } catch (error) {
@@ -40,7 +40,7 @@ const StockInward = () => {
 
   const fetchSuppliers = async () => {
     try {
-      const response = await fetch('http://52.66.98.128:5001/api/suppliers');
+      const response = await fetch('https://api.cctvshoppee.com/api/suppliers');
       const data = await response.json();
       setSuppliers(data);
     } catch (error) {
@@ -55,7 +55,7 @@ const StockInward = () => {
 
   const fetchLocations = async () => {
     try {
-      const response = await fetch('http://52.66.98.128:5001/api/locations');
+      const response = await fetch('https://api.cctvshoppee.com/api/locations');
       const data = await response.json();
       setLocations(data);
     } catch (error) {
@@ -127,14 +127,14 @@ const StockInward = () => {
   const updateProductStock = async (productId, quantity) => {
     try {
       // First get the current product to know the current stock
-      const productResponse = await fetch(`http://52.66.98.128:5001/api/products/${productId}`);
+      const productResponse = await fetch(`https://api.cctvshoppee.com/api/products/${productId}`);
       const product = await productResponse.json();
       
       const currentStock = parseFloat(product.stockQuantity || product.quantity || product.stock || 0);
       const newStock = currentStock + parseInt(quantity);
       
       // Update the product stock
-      const updateResponse = await fetch(`http://52.66.98.128:5001/api/products/${productId}`, {
+      const updateResponse = await fetch(`https://api.cctvshoppee.com/api/products/${productId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -182,7 +182,7 @@ const StockInward = () => {
         createdBy: 'Admin'
       };
 
-      const response = await fetch('http://52.66.98.128:5001/api/stock-inward', {
+      const response = await fetch('https://api.cctvshoppee.com/api/stock-inward', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

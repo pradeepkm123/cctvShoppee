@@ -19,7 +19,7 @@ function AccountDetails() {
       }
 
       try {
-        const response = await axios.get('http://52.66.98.128:5001/api/users/me', {
+        const response = await axios.get('https://api.cctvshoppee.com/api/users/me', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

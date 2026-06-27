@@ -7,8 +7,8 @@ import 'swiper/css';
 import 'swiper/css/scrollbar';
 
 // ---- Adjust if your server hosts files elsewhere ----
-const API_BASE = 'http://52.66.98.128:5001/api';
-const FILE_HOST = 'http://52.66.98.128:5001';
+const API_BASE = 'https://api.cctvshoppee.com/api';
+const FILE_HOST = 'https://api.cctvshoppee.com';
 // -----------------------------------------------------
 const getImageUrl = (img) => {
   if (!img) return '/no-image.png';

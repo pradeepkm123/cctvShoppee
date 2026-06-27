@@ -29,7 +29,7 @@ const AdminChat = () => {
 
   // Connect to Socket.IO
   useEffect(() => {
-    const socket = io('http://52.66.98.128:5001');
+    const socket = io('https://api.cctvshoppee.com');
     socketRef.current = socket;
 
     socket.on('newMessage', (msg) => {

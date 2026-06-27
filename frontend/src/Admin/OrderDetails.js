@@ -64,7 +64,7 @@ const OrderDetails = ({ order, onBack }) => {
       setIsLoading(true);
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(`http://52.66.98.128:5001/api/orders/${order._id}/timeline`, {
+        const response = await fetch(`https://api.cctvshoppee.com/api/orders/${order._id}/timeline`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -126,7 +126,7 @@ const OrderDetails = ({ order, onBack }) => {
   const updateOrderStatusInDB = async (newStatus, note) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://52.66.98.128:5001/api/orders/${order._id}/status`, {
+      const response = await fetch(`https://api.cctvshoppee.com/api/orders/${order._id}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -148,7 +148,7 @@ const OrderDetails = ({ order, onBack }) => {
   const processRefundInDB = async (refundAmount, refundReason) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://52.66.98.128:5001/api/orders/${order._id}/refund`, {
+      const response = await fetch(`https://api.cctvshoppee.com/api/orders/${order._id}/refund`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -170,7 +170,7 @@ const OrderDetails = ({ order, onBack }) => {
   const cancelOrderInDB = async (reason) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://52.66.98.128:5001/api/orders/${order._id}/cancel`, {
+      const response = await fetch(`https://api.cctvshoppee.com/api/orders/${order._id}/cancel`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -200,7 +200,7 @@ const OrderDetails = ({ order, onBack }) => {
         user: "System",
       };
       const updatedTimeline = deduplicateTimelineData([...timelineData, newTimelineEntry]);
-      await fetch(`http://52.66.98.128:5001/api/orders/${order._id}/timeline`, {
+      await fetch(`https://api.cctvshoppee.com/api/orders/${order._id}/timeline`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -226,7 +226,7 @@ const OrderDetails = ({ order, onBack }) => {
         user: "Admin User",
       };
       const updatedTimeline = deduplicateTimelineData([...timelineData, newTimelineEntry]);
-      await fetch(`http://52.66.98.128:5001/api/orders/${order._id}/timeline`, {
+      await fetch(`https://api.cctvshoppee.com/api/orders/${order._id}/timeline`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -252,7 +252,7 @@ const OrderDetails = ({ order, onBack }) => {
         user: "Admin User",
       };
       const updatedTimeline = deduplicateTimelineData([...timelineData, newTimelineEntry]);
-      await fetch(`http://52.66.98.128:5001/api/orders/${order._id}/timeline`, {
+      await fetch(`https://api.cctvshoppee.com/api/orders/${order._id}/timeline`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -409,9 +409,9 @@ const OrderDetails = ({ order, onBack }) => {
             }}
           >
             <img
-              src={`http://52.66.98.128:5001/uploads/${item.productId?.image}`}
+              src={`https://api.cctvshoppee.com/uploads/${item.productId?.image}`}
               alt={item.productId?.name || "Product"}
-              onClick={() => setSelectedFullImage(`http://52.66.98.128:5001/uploads/${item.productId?.image}`)}
+              onClick={() => setSelectedFullImage(`https://api.cctvshoppee.com/uploads/${item.productId?.image}`)}
               style={{
                 marginRight: "16px",
                 border: "1px solid #e6e6e6",
@@ -562,9 +562,9 @@ const OrderDetails = ({ order, onBack }) => {
                 {(item.status === "Shipment Created" || item.status === "Delivered") && (
                   <div style={{ display: "flex", alignItems: "center", marginTop: "8px" }}>
                     <img
-                      src={`http://52.66.98.128:5001/uploads/${order.items[0]?.productId?.image}`}
+                      src={`https://api.cctvshoppee.com/uploads/${order.items[0]?.productId?.image}`}
                       alt={order.items[0]?.productId?.name || "Product"}
-                      onClick={() => setSelectedFullImage(`http://52.66.98.128:5001/uploads/${order.items[0]?.productId?.image}`)}
+                      onClick={() => setSelectedFullImage(`https://api.cctvshoppee.com/uploads/${order.items[0]?.productId?.image}`)}
                       style={{
                         width: "40px",
                         height: "40px",
@@ -612,9 +612,9 @@ const OrderDetails = ({ order, onBack }) => {
         {/* Product Preview */}
         <div style={{ marginBottom: "20px", display: "flex", alignItems: "center" }}>
           <img
-            src={`http://52.66.98.128:5001/uploads/${order.items[0]?.productId?.image}`}
+            src={`https://api.cctvshoppee.com/uploads/${order.items[0]?.productId?.image}`}
             alt={order.items[0]?.productId?.name || "Product"}
-            onClick={() => setSelectedFullImage(`http://52.66.98.128:5001/uploads/${order.items[0]?.productId?.image}`)}
+            onClick={() => setSelectedFullImage(`https://api.cctvshoppee.com/uploads/${order.items[0]?.productId?.image}`)}
             style={{
               width: "60px",
               height: "60px",
@@ -758,9 +758,9 @@ const OrderDetails = ({ order, onBack }) => {
         {/* Product Preview */}
         <div style={{ marginBottom: "20px", display: "flex", alignItems: "center" }}>
           <img
-            src={`http://52.66.98.128:5001/uploads/${order.items[0]?.productId?.image}`}
+            src={`https://api.cctvshoppee.com/uploads/${order.items[0]?.productId?.image}`}
             alt={order.items[0]?.productId?.name || "Product"}
-            onClick={() => setSelectedFullImage(`http://52.66.98.128:5001/uploads/${order.items[0]?.productId?.image}`)}
+            onClick={() => setSelectedFullImage(`https://api.cctvshoppee.com/uploads/${order.items[0]?.productId?.image}`)}
             style={{
               width: "40px",
               height: "40px",
@@ -926,7 +926,7 @@ const OrderDetails = ({ order, onBack }) => {
                 {order.returnRequest.images.map((image, index) => {
                   let imgSrc = image;
                   if (!imgSrc.startsWith('http')) {
-                    imgSrc = `http://52.66.98.128:5001${imgSrc.startsWith('/uploads') ? '' : '/uploads/'}${imgSrc}`;
+                    imgSrc = `https://api.cctvshoppee.com${imgSrc.startsWith('/uploads') ? '' : '/uploads/'}${imgSrc}`;
                   }
                   return (
                     <img

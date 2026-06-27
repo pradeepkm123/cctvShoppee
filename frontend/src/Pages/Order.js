@@ -112,7 +112,7 @@ function Order() {
         return;
       }
       try {
-        const response = await axios.get('http://52.66.98.128:5001/api/orders', {
+        const response = await axios.get('https://api.cctvshoppee.com/api/orders', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setOrders(Array.isArray(response.data) ? response.data : []);
@@ -129,7 +129,7 @@ function Order() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get('http://52.66.98.128:5001/api/categories');
+        const res = await axios.get('https://api.cctvshoppee.com/api/categories');
         const map = {};
         (res.data || []).forEach((c) => {
           if (c && c._id) map[c._id] = c.name || c.title || 'Unknown';
@@ -281,7 +281,7 @@ function Order() {
   const fileUrl = (img) => {
     if (!img) return '/no-image.png';
     const safe = String(img).replace(/\\/g, '/');
-    return safe.startsWith('http') ? safe : `http://52.66.98.128:5001/uploads/${safe.split('/').pop()}`;
+    return safe.startsWith('http') ? safe : `https://api.cctvshoppee.com/uploads/${safe.split('/').pop()}`;
   };
 
   // Handle Swipe Delete
@@ -290,7 +290,7 @@ function Order() {
       if (!window.confirm("Are you sure you want to delete this order?")) return;
 
       const token = localStorage.getItem('token');
-      await axios.delete(`http://52.66.98.128:5001/api/orders/${orderId}`, {
+      await axios.delete(`https://api.cctvshoppee.com/api/orders/${orderId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setOrders((prev) => prev.filter(o => o._id !== orderId));

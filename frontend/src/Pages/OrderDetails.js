@@ -111,10 +111,10 @@ function OrderDetails() {
             }
             try {
                 const [orderResponse, timelineResponse] = await Promise.all([
-                    axios.get(`http://52.66.98.128:5001/api/orders/${orderId}`, {
+                    axios.get(`https://api.cctvshoppee.com/api/orders/${orderId}`, {
                         headers: { Authorization: `Bearer ${token}` },
                     }),
-                    axios.get(`http://52.66.98.128:5001/api/orders/${orderId}/timeline`, {
+                    axios.get(`https://api.cctvshoppee.com/api/orders/${orderId}/timeline`, {
                         headers: { Authorization: `Bearer ${token}` },
                     }),
                 ]);
@@ -146,7 +146,7 @@ function OrderDetails() {
                 additionalComments,
             };
             const response = await axios.post(
-                `http://52.66.98.128:5001/api/orders/${orderId}/cancel`,
+                `https://api.cctvshoppee.com/api/orders/${orderId}/cancel`,
                 cancelData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -183,7 +183,7 @@ function OrderDetails() {
                 formData.append('images', file);
             });
             const response = await axios.post(
-                `http://52.66.98.128:5001/api/orders/${orderId}/return`,
+                `https://api.cctvshoppee.com/api/orders/${orderId}/return`,
                 formData,
                 {
                     headers: {
@@ -271,7 +271,7 @@ function OrderDetails() {
         if (!img) return 'https://via.placeholder.com/100?text=No+Image';
         if (img.startsWith('http')) return img;
         const cleaned = img.split('/').pop();
-        return `http://52.66.98.128:5001/uploads/${cleaned}`;
+        return `https://api.cctvshoppee.com/uploads/${cleaned}`;
     };
 
     // Helper: nicely format price

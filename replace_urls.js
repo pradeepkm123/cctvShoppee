@@ -1,8 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const targetUrl = 'http://52.66.98.128:5001';
+const targetUrl = 'https://api.cctvshoppee.com';
 const toReplace = [
+  'http://52.66.98.128:5001',
   'https://cctvshoppee.onrender.com',
   'http://localhost:5000'
 ];
@@ -32,17 +33,17 @@ let replacedCount = 0;
 files.forEach(file => {
   let content = fs.readFileSync(file, 'utf8');
   let newContent = content;
-  
+
   toReplace.forEach(searchStr => {
-    // Escape for regex or just use split/join
     newContent = newContent.split(searchStr).join(targetUrl);
   });
-  
+
   if (content !== newContent) {
     fs.writeFileSync(file, newContent, 'utf8');
     replacedCount++;
-    console.log(`Updated ${file}`);
+    console.log(`✅ Updated: ${path.relative(__dirname, file)}`);
   }
 });
 
-console.log(`Successfully updated ${replacedCount} files.`);
+console.log(`\n🎉 Done! Updated ${replacedCount} files.`);
+console.log(`   Old URLs replaced with: ${targetUrl}`);

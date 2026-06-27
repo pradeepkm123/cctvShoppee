@@ -18,13 +18,13 @@ const NotificationsAlerts = () => {
         setLoading(true);
         
         // Fetch orders
-        const ordersResponse = await fetch('http://52.66.98.128:5001/api/orders/public');
+        const ordersResponse = await fetch('https://api.cctvshoppee.com/api/orders/public');
         if (!ordersResponse.ok) throw new Error('Orders API error');
         const ordersData = await ordersResponse.json();
         const orders = ordersData.orders || ordersData || [];
 
         // Fetch products
-        const productsResponse = await fetch('http://52.66.98.128:5001/api/products');
+        const productsResponse = await fetch('https://api.cctvshoppee.com/api/products');
         if (!productsResponse.ok) throw new Error('Products API error');
         const productsData = await productsResponse.json();
         const products = productsData.products || productsData || [];

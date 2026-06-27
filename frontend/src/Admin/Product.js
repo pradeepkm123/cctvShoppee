@@ -6,7 +6,7 @@ import EditProductDrawer from './EditProductDrawer';
 import axios from 'axios';
 import './Products.css'; // We'll create this new CSS file
 
-const API_BASE = 'http://52.66.98.128:5001/api';
+const API_BASE = 'https://api.cctvshoppee.com/api';
 
 function Product() {
   const [drawerOpen, setDrawerOpen] = useState(false);

@@ -20,8 +20,8 @@ import {
 } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
-const API_BASE = 'http://52.66.98.128:5001/api';
-const FILE_HOST = 'http://52.66.98.128:5001';
+const API_BASE = 'https://api.cctvshoppee.com/api';
+const FILE_HOST = 'https://api.cctvshoppee.com';
 
 function Wishlist() {
   const navigate = useNavigate();
