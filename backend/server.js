@@ -32,6 +32,17 @@ const notificationRoutes = require('./routes/notificationRoutes');
 
 const app = express();
 
+// ✅ CORS — must be FIRST before any routes or static files
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+app.options('*', cors()); // Handle preflight for all routes
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // Ensure uploads directory exists
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
@@ -39,12 +50,6 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Connect MongoDB
 connectDB();
