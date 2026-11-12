@@ -238,7 +238,7 @@ function Footer() {
                                 <div class="row align-items-center">
                                     <div class="col-md-6">
                                         <div class="tp-footer-copyright">
-                                            <p>© 2025 All Rights Reserved  | <a href="index.html">CCTV SHOPPEE</a></p>
+                                            <p>© 2026 All Rights Reserved  | <a href="index.html">CCTV SHOPPEE</a></p>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
