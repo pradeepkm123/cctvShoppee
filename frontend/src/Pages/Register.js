@@ -59,7 +59,7 @@ function Register() {
 
     if (Object.keys(newErrors).length === 0) {
       try {
-        const response = await axios.post('https://api.cctvshoppee.com/api/auth/register', {
+        const response = await axios.post('https://cctvshoppee.onrender.com/api/auth/register', {
           name: formData.name,
           mobileNo: formData.mobileNo,
           email: formData.email,

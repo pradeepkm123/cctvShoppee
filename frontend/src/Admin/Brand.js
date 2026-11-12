@@ -26,7 +26,7 @@ const BrandManagement = () => {
   // Fetch brands from backend
   const fetchBrands = async () => {
     try {
-      const response = await axios.get('https://api.cctvshoppee.com/api/brands');
+      const response = await axios.get('https://cctvshoppee.onrender.com/api/brands');
       setBrands(response.data);
     } catch (error) {
       console.error('Error fetching brands:', error);
@@ -93,10 +93,10 @@ const BrandManagement = () => {
       };
 
       if (editingBrand) {
-        await axios.put(`https://api.cctvshoppee.com/api/brands/${editingBrand._id}`, brandData);
+        await axios.put(`https://cctvshoppee.onrender.com/api/brands/${editingBrand._id}`, brandData);
         setBrands(brands.map(b => b._id === editingBrand._id ? { ...b, ...brandData } : b));
       } else {
-        const response = await axios.post('https://api.cctvshoppee.com/api/brands', brandData);
+        const response = await axios.post('https://cctvshoppee.onrender.com/api/brands', brandData);
         setBrands([...brands, response.data]);
       }
       setShowAddModal(false);
@@ -118,7 +118,7 @@ const BrandManagement = () => {
   // Confirm Delete Brand
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`https://api.cctvshoppee.com/api/brands/${selectedBrand._id}`);
+      await axios.delete(`https://cctvshoppee.onrender.com/api/brands/${selectedBrand._id}`);
       setBrands(brands.filter(b => b._id !== selectedBrand._id));
       setShowDeleteModal(false);
       setSelectedBrand(null);

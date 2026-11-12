@@ -8,7 +8,7 @@ import Call from '../Image/icons8-call.gif';
 import { WishlistContext } from '../Components/WishlistContext';
 
 
-const API_BASE = 'https://api.cctvshoppee.com/api';
+const API_BASE = 'https://cctvshoppee.onrender.com/api';
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

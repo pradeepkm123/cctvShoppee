@@ -5,7 +5,7 @@ import Navbar from '../Components/Navbar';
 import Footer from '../Components/Footer';
 import { WishlistContext } from '../Components/WishlistContext';
 
-const API_BASE = 'https://api.cctvshoppee.com/api';
+const API_BASE = 'https://cctvshoppee.onrender.com/api';
 
 function MyAccount() {
   const navigate = useNavigate();

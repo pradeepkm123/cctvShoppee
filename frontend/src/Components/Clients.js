@@ -3,7 +3,7 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
-const API_BASE = process.env.REACT_APP_API_BASE || 'https://api.cctvshoppee.com';
+const API_BASE = process.env.REACT_APP_API_BASE || 'https://cctvshoppee.onrender.com';
 
 function Clients() {
   const [clients, setClients] = useState([]);

@@ -16,7 +16,7 @@ const PaymentsTransactions = () => {
         setLoading(true);
         
         // Fetch orders using public endpoint
-        const ordersResponse = await fetch('https://api.cctvshoppee.com/api/orders/public');
+        const ordersResponse = await fetch('https://cctvshoppee.onrender.com/api/orders/public');
         if (!ordersResponse.ok) {
           throw new Error(`Orders API error: ${ordersResponse.status}`);
         }

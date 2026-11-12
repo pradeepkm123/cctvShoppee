@@ -31,7 +31,7 @@ function Product() {
 
   const fetchProducts = async () => {
     try {
-      let url = 'https://api.cctvshoppee.com/api/products';
+      let url = 'https://cctvshoppee.onrender.com/api/products';
       if (category) {
         url += `?category=${encodeURIComponent(category)}`;
       }

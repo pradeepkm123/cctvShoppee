@@ -29,7 +29,7 @@ const AdminChat = () => {
 
   // Connect to Socket.IO
   useEffect(() => {
-    const socket = io('https://api.cctvshoppee.com');
+    const socket = io('https://cctvshoppee.onrender.com');
     socketRef.current = socket;
 
     socket.on('newMessage', (msg) => {

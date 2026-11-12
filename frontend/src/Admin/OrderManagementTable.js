@@ -17,7 +17,7 @@ const OrderManagementTable = ({ onOrderClick }) => {
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
 
-  const API_BASE = "https://api.cctvshoppee.com/api";
+  const API_BASE = "https://cctvshoppee.onrender.com/api";
 
   // ✅ Format address safely
   const formatAddress = (address) => {

@@ -10,7 +10,7 @@ function TransactionHistory() {
     const fetchTransactions = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('https://api.cctvshoppee.com/api/supercoins/transactions', {
+        const response = await fetch('https://cctvshoppee.onrender.com/api/supercoins/transactions', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

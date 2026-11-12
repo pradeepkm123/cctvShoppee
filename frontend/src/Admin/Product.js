@@ -6,7 +6,7 @@ import EditProductDrawer from './EditProductDrawer';
 import axios from 'axios';
 import './Products.css'; // We'll create this new CSS file
 
-const API_BASE = 'https://api.cctvshoppee.com/api';
+const API_BASE = 'https://cctvshoppee.onrender.com/api';
 
 function Product() {
   const [drawerOpen, setDrawerOpen] = useState(false);

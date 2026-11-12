@@ -14,8 +14,8 @@ import {
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
-const API_BASE = 'https://api.cctvshoppee.com/api';
-const FILE_HOST = 'https://api.cctvshoppee.com';
+const API_BASE = 'https://cctvshoppee.onrender.com/api';
+const FILE_HOST = 'https://cctvshoppee.onrender.com';
 
 const toAbsUrl = (u) => {
   if (!u) return '';

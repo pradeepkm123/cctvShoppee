@@ -40,7 +40,7 @@ const StoreCustomizations = () => {
     });
     const [uploadingPopup, setUploadingPopup] = useState(false);
 
-    const API_BASE = (process.env.REACT_APP_API_BASE || 'https://api.cctvshoppee.com').replace(/\/api$/, '');
+    const API_BASE = (process.env.REACT_APP_API_BASE || 'https://cctvshoppee.onrender.com').replace(/\/api$/, '');
 
     const toAbsUrl = (path) => {
         if (!path) return '';

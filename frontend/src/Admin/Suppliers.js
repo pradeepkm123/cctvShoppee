@@ -20,7 +20,7 @@ const SuppliersAndVendors = () => {
 
   // Fetch suppliers from API
   useEffect(() => {
-    fetch('https://api.cctvshoppee.com/api/suppliers')
+    fetch('https://cctvshoppee.onrender.com/api/suppliers')
       .then((res) => res.json())
       .then((data) => {
         setSuppliers(data);
@@ -46,7 +46,7 @@ const SuppliersAndVendors = () => {
 
   const handleAddSupplier = (e) => {
     e.preventDefault();
-    fetch('https://api.cctvshoppee.com/api/suppliers', {
+    fetch('https://cctvshoppee.onrender.com/api/suppliers', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newSupplier),

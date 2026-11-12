@@ -7,8 +7,8 @@ import 'swiper/css';
 import 'swiper/css/scrollbar';
 
 // ---- Adjust if your server hosts files elsewhere ----
-const API_BASE = 'https://api.cctvshoppee.com/api';
-const FILE_HOST = 'https://api.cctvshoppee.com';
+const API_BASE = 'https://cctvshoppee.onrender.com/api';
+const FILE_HOST = 'https://cctvshoppee.onrender.com';
 // -----------------------------------------------------
 const getImageUrl = (img) => {
   if (!img) return '/no-image.png';

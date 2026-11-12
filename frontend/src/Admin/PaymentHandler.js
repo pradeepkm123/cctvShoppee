@@ -6,7 +6,7 @@ const PaymentHandler = ({ order }) => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `https://api.cctvshoppee.com/api/orders/${order._id}/pay`,
+        `https://cctvshoppee.onrender.com/api/orders/${order._id}/pay`,
         { transactionId: paymentId, amount: order.totalAmount },
         { headers: { Authorization: `Bearer ${token}` } }
       );

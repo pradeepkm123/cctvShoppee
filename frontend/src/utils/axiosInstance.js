@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: 'https://api.cctvshoppee.com/api', // your backend API
+  baseURL: 'https://cctvshoppee.onrender.com/api', // your backend API
   headers: { 'Content-Type': 'application/json' },
 });
 
