@@ -48,9 +48,7 @@ let io;
 const init = (server) => {
   io = socketIo(server, {
     cors: {
-      origin: [
-        "http://localhost:3000",     // React dev frontend
-      ],
+      origin: (origin, callback) => callback(null, true),
       methods: ["GET", "POST", "DELETE"],
       credentials: true,
     },

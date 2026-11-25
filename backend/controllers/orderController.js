@@ -1201,6 +1201,7 @@ const Order = require("../models/Order");
 const mongoose = require("mongoose");
 const Product = require("../models/Product");
 const { createNotification } = require("./notificationController");
+const whatsappService = require("../services/whatsappService");
 const PDFDocument = require('pdfkit');
 const path = require('path');
 const fs = require('fs');
@@ -1396,6 +1397,11 @@ exports.createOrder = async (req, res) => {
       "Order",
       `/order-details/${newOrder._id}`
     );
+
+    // Flipkart-style WhatsApp notification
+    whatsappService.notifyOrderPlaced(newOrder).catch((err) => {
+      console.error('[WhatsApp] notifyOrderPlaced error:', err.message);
+    });
 
     res.status(201).json({
       success: true,
@@ -1637,6 +1643,25 @@ exports.updateOrderStatus = async (req, res) => {
       `/order-details/${order._id}`
     );
 
+    // Flipkart-style WhatsApp notification on status change
+    try {
+      if (status === "Confirmed") {
+        whatsappService.notifyOrderConfirmed(updatedOrder);
+      } else if (status === "Packed") {
+        whatsappService.notifyOrderPacked(updatedOrder);
+      } else if (status === "Shipment Created" || status === "Shipped") {
+        whatsappService.notifyOrderShipped(updatedOrder);
+      } else if (status === "Item Out to Delivery" || status === "Out for Delivery") {
+        whatsappService.notifyOrderOutForDelivery(updatedOrder);
+      } else if (status === "Delivered") {
+        whatsappService.notifyOrderDelivered(updatedOrder);
+      } else if (status === "Cancelled") {
+        whatsappService.notifyOrderCancelled(updatedOrder, note);
+      }
+    } catch (wsErr) {
+      console.error('[WhatsApp] updateOrderStatus notification error:', wsErr.message);
+    }
+
     res.json({ success: true, order: updatedOrder });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -1864,6 +1889,11 @@ exports.cancelOrder = async (req, res) => {
       "Order",
       `/order-details/${order._id}`
     );
+
+    // Flipkart-style WhatsApp notification on cancellation
+    whatsappService.notifyOrderCancelled(updatedOrder, reason).catch((err) => {
+      console.error('[WhatsApp] notifyOrderCancelled error:', err.message);
+    });
     res.json({
       success: true,
       message: "Order cancelled successfully",

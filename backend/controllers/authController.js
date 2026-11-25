@@ -49,15 +49,31 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { mobileNo, password } = req.body;
-    const user = await User.findOne({ mobileNo });
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid mobile number or password' });
+    const { mobileNo, email, identifier, password } = req.body;
+    const loginIdentifier = (identifier || email || mobileNo || '').trim();
+
+    if (!loginIdentifier || !password) {
+      return res.status(400).json({ message: 'Mobile number or Email ID and password are required' });
     }
+
+    // Support login via either mobileNo OR email
+    const user = await User.findOne({
+      $or: [
+        { email: loginIdentifier.toLowerCase() },
+        { email: loginIdentifier },
+        { mobileNo: loginIdentifier },
+      ],
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid Mobile No / Email ID or password' });
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(400).json({ message: 'Invalid mobile number or password' });
+      return res.status(400).json({ message: 'Invalid Mobile No / Email ID or password' });
     }
+
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.status(200).json({ token, userId: user._id });
   } catch (error) {
@@ -68,17 +84,29 @@ exports.login = async (req, res) => {
 exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).send('User not found');
+    if (!user) {
+      return res.status(404).json({ message: 'No account registered with this email' });
+    }
 
     const otp = generateOTP();
-    // sendOTP now handles saving the OTP to the database
+    user.otp = otp;
+    user.otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+    await user.save();
+
+    console.log(`🔑 [AUTH] Generated OTP for ${email}: ${otp}`);
+
     await sendOTP(email, otp);
 
-    res.status(200).send('OTP sent to your email');
+    res.status(200).json({ message: 'OTP sent to your email' });
   } catch (error) {
     console.error('Forgot password error:', error);
-    res.status(500).send('Error sending OTP');
+    const errorMsg = error?.message || 'Error sending OTP. Please check email configuration.';
+    res.status(500).json({ message: errorMsg });
   }
 };
 

@@ -162,6 +162,7 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const slideRoutes = require('./routes/slideRoutes');
 const clientRoutes = require('./routes/clientRoutes');
 const popupRoutes = require('./routes/popupRoutes');
+const whatsappRoutes = require('./routes/whatsappRoutes');
 
 // Initialize Express
 const app = express();
@@ -181,7 +182,12 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Body parsing middleware
-app.use(express.json({ limit: '50mb' }));
+app.use(express.json({
+  limit: '50mb',
+  verify: (req, res, buf) => {
+    req.rawBody = buf;
+  }
+}));
 app.use(express.urlencoded({
   extended: true,
   limit: '50mb'
@@ -238,6 +244,8 @@ app.use('/api/slides', slideRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/popups', popupRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/whatsapp', whatsappRoutes);
+app.use('/whatsapp', whatsappRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

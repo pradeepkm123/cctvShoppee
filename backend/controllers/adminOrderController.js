@@ -1,5 +1,6 @@
 const Order = require('../models/Order');
 const { createNotification } = require('./notificationController');
+const whatsappService = require('../services/whatsappService');
 
 // Get all orders (Admin)
 exports.getAllOrders = async (req, res) => {
@@ -44,6 +45,25 @@ exports.updateOrderStatus = async (req, res) => {
       "Order",
       `/order-details/${order._id}`
     );
+
+    // Flipkart-style WhatsApp notification on admin status update
+    try {
+      if (status === "Confirmed") {
+        whatsappService.notifyOrderConfirmed(order);
+      } else if (status === "Packed") {
+        whatsappService.notifyOrderPacked(order);
+      } else if (status === "Shipment Created" || status === "Shipped") {
+        whatsappService.notifyOrderShipped(order);
+      } else if (status === "Item Out to Delivery" || status === "Out for Delivery") {
+        whatsappService.notifyOrderOutForDelivery(order);
+      } else if (status === "Delivered") {
+        whatsappService.notifyOrderDelivered(order);
+      } else if (status === "Cancelled") {
+        whatsappService.notifyOrderCancelled(order, note);
+      }
+    } catch (wsErr) {
+      console.error('[WhatsApp] admin updateOrderStatus notification error:', wsErr.message);
+    }
 
     res.json(order);
   } catch (error) {
