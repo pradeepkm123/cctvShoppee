@@ -1,30 +1,79 @@
 // utils/emailService.js
 const nodemailer = require('nodemailer');
+const dns = require('dns');
+const path = require('path');
+const fs = require('fs');
 const User = require('../models/User');
+
+// Prefer IPv4 for DNS lookups to avoid IPv6 timeouts on Render/cloud servers
+if (dns.setDefaultResultOrder) {
+  try {
+    dns.setDefaultResultOrder('ipv4first');
+  } catch (e) {
+    // ignore if not supported
+  }
+}
 
 const generateOTP = () => {
   return Math.floor(1000 + Math.random() * 9000).toString();
 };
 
 const sendOTP = async (email, otp) => {
+  const user = (process.env.EMAIL_USER || '').trim();
+  const pass = (process.env.EMAIL_PASS || '').replace(/[\s"']/g, '').trim();
+
+  if (!user || !pass) {
+    throw new Error('Email credentials (EMAIL_USER or EMAIL_PASS) are not configured');
+  }
+
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      user: user,
+      pass: pass,
     },
+    family: 4, // Force IPv4 to prevent connection timeouts on Render
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
+    tls: {
+      rejectUnauthorized: false
+    }
   });
 
+  // Prepare logo attachment
+  const logoCandidates = [
+    path.join(__dirname, '../assets/logo.png'),
+    path.join(__dirname, '../uploads/logo.png'),
+    path.join(__dirname, '../../frontend/src/Image/logo.png')
+  ];
+
+  let logoAttachment = null;
+  for (const candidate of logoCandidates) {
+    if (fs.existsSync(candidate)) {
+      logoAttachment = {
+        filename: 'logo.png',
+        path: candidate,
+        cid: 'cctv_logo'
+      };
+      break;
+    }
+  }
+
   const mailOptions = {
-    from: `"CCTV SHOPPEE" <${process.env.EMAIL_USER}>`,
+    from: `"CCTV SHOPPEE" <${user}>`,
     to: email,
     subject: `Password Reset OTP - CCTV SHOPPEE`,
     text: `Your OTP for password reset is: ${otp}`,
     html: `
       <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 20px auto; border: 1px solid #eee; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-        <div style="background: linear-gradient(135deg, #2874f0 0%, #1c54b2 100%); color: white; padding: 40px 20px; text-align: center;">
-          <h1 style="margin: 0; font-size: 32px; letter-spacing: 1px; text-transform: uppercase;">CCTV SHOPPEE</h1>
-          <p style="margin-top: 10px; opacity: 0.9; font-size: 16px;">Secure Password Reset</p>
+        <div style="background: linear-gradient(135deg, #2874f0 0%, #1c54b2 100%); color: white; padding: 32px 20px; text-align: center;">
+          <div style="display: inline-block; background-color: #ffffff; padding: 10px 24px; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+            <img src="${logoAttachment ? 'cid:cctv_logo' : 'https://cctvshoppee.onrender.com/uploads/logo.png'}" alt="CCTV SHOPPEE" style="max-height: 48px; max-width: 220px; height: auto; width: auto; display: block; margin: 0 auto;" />
+          </div>
+          <p style="margin: 0; opacity: 0.95; font-size: 16px; font-weight: 500; letter-spacing: 0.5px;">Secure Password Reset</p>
         </div>
         <div style="padding: 40px; line-height: 1.8; color: #444; background-color: #ffffff;">
           <p style="font-size: 18px; margin-bottom: 20px;">Hello,</p>
@@ -52,6 +101,7 @@ const sendOTP = async (email, otp) => {
         </div>
       </div>
     `,
+    attachments: logoAttachment ? [logoAttachment] : []
   };
 
   try {
@@ -59,11 +109,11 @@ const sendOTP = async (email, otp) => {
     console.log('OTP Email sent successfully to ' + email);
 
     // Store OTP and expiration time in the database after successful send
-    const user = await User.findOne({ email });
-    if (user) {
-      user.otp = otp;
-      user.otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
-      await user.save();
+    const userDoc = await User.findOne({ email });
+    if (userDoc) {
+      userDoc.otp = otp;
+      userDoc.otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+      await userDoc.save();
     }
     return true;
   } catch (error) {
