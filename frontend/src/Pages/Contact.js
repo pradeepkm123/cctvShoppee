@@ -92,7 +92,7 @@ function About() {
                               </div>
                               <div class="tp-contact-info-content">
                                  <p data-info="mail"><a href="mailto:sales@cctvshoppee.com">sales@cctvshoppee.com</a></p>
-                                 <p data-info="phone"><a href="tel:+919994335344">+91 9994335344</a></p>
+                                 <p data-info="phone"><a href="tel:+917418667333">+91 7418667333</a></p>
                               </div>
                            </div>
                            <div class="tp-contact-info-item">
@@ -103,8 +103,8 @@ function About() {
                               </div>
                               <div class="tp-contact-info-content">
                                  <p>
-                                    <a href="https://maps.app.goo.gl/vtn9GAXn59JxYjfv5" target="_blank">
-                                       No:6/97 Jaya Nagar,Meera Complex.Mount Poonamallee <br /> High road, Porur Chennai - 600116
+                                    <a href="https://maps.google.com/?q=173,+NEW+MILITARY+ROAD,+KANNIGAPURAM,+TNHB+MIG+V+BLOCK,+AVADI,+TAMIL+NADU+-+600054" target="_blank">
+                                       173, New Military Road, Kannigapuram,<br /> TNHB MIG V Block, Avadi, Tamil Nadu - 600054
                                     </a>
                                  </p>
                               </div>
@@ -147,7 +147,7 @@ function About() {
                            </span>
                         </div>
                         <div class="tp-map-iframe">
-                          <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d6604.864239347136!2d80.1490307!3d13.0356358!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a52615d5e910e59%3A0x9ea7a355f133ac04!2sCCTV%20SHOPPEE%20-%20PORUR!5e1!3m2!1sen!2sin!4v1763104372029!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                          <iframe src="https://maps.google.com/maps?q=173+NEW+MILITARY+ROAD+KANNIGAPURAM+AVADI+TAMIL+NADU+600054&t=&z=15&ie=UTF8&iwloc=&output=embed" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                         </div>
                      </div>
                   </div>

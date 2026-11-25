@@ -1,10 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
-const targetUrl = 'https://api.cctvshoppee.com';
+const targetUrl = 'https://cctvshoppee.onrender.com';
 const toReplace = [
+  'https://api.cctvshoppee.com',
+  'http://api.cctvshoppee.com',
   'http://52.66.98.128:5001',
-  'https://cctvshoppee.onrender.com',
   'http://localhost:5000'
 ];
 
